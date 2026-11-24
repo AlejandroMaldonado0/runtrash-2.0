@@ -183,6 +183,36 @@
     box-shadow: var(--shadow-sm);
 }
 
+.dashboard-page .detail-fotos {
+    display: grid;
+    gap: 10px;
+}
+
+.dashboard-page .estado-foto {
+    margin-top: 12px;
+}
+
+.dashboard-page .estado-foto-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.dashboard-page .estado-foto input[type="file"] {
+    width: 100%;
+    color: #eafff1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(217, 247, 108, 0.55);
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 12px;
+}
+
+
 .dashboard-page .image-preview {
     display: none;
     margin-top: 9px;

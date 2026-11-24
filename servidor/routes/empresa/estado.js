@@ -15,11 +15,14 @@ const { requiereOperario } = require('../../lib/auth');
 const { emitirEvento } = require('../../lib/eventos');
 const { notificarUsuarios, idsPorRol } = require('../../lib/notificaciones');
 const { enParaleloSeguro } = require('../../lib/concurrencia');
+const upload = require('../../lib/upload');
+const almacen = require('../../lib/almacen');
 
 const router = express.Router();
 
 router.put('/reportes/:id/estado',
     requiereOperario,
+    upload.single('foto'),
     async (req, res) => {
 
         try {
@@ -27,7 +30,7 @@ router.put('/reportes/:id/estado',
             const reporteId =
                 Number(req.params.id);
 
-            const estado = String(req.body.estado || '').trim().toLowerCase();
+            const estado = String(req.body?.estado || '').trim().toLowerCase();
             const operadorId = req.usuarioAutenticado.id;
 
             /*
@@ -36,10 +39,39 @@ router.put('/reportes/:id/estado',
             "pendiente" sigue siendo el estado inicial de todo reporte
             asignado y por eso no se permite fijarlo desde aquí.
             */
+            let imagenOperarioUrl = null;
+
+            if (estado === 'completado') {
+
+                /*
+                Al completar, el operario debe adjuntar la foto de
+                evidencia de la recolección. Esa foto viaja junto con el
+                estado y se guarda en el reporte; la foto del ciudadano
+                sigue viva en `imagen_url`.
+                */
+                if (!req.file) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje:
+                            'Debes adjuntar una foto del operario al completar el reporte.'
+                    });
+                }
+
+                const extension = String(
+                    (req.file.originalname || '').split('.').pop() || 'jpg'
+                ).toLowerCase();
+                const clave = await almacen.guardar(
+                    req.file.buffer,
+                    `.${extension}`
+                );
+                imagenOperarioUrl = `/uploads/${clave}`;
+            }
+
             const actualizado = await reportesService.cambiarEstadoReporte({
                 reporteId,
                 operarioId: operadorId,
-                estado
+                estado,
+                imagenOperarioUrl
             });
 
             const empresaId = req.usuarioAutenticado.empresa_id;

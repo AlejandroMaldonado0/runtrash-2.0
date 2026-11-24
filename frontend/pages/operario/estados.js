@@ -77,6 +77,11 @@ function solicitarCambioEstado(id, state) {
             Estado actual: <strong class="status ${claseEstado(estadoActual)}">${textoEstado(estadoActual)}</strong>
         </div>
         <div class="estado-opciones" id="estadoOpciones" role="group" aria-label="Elige el estado del reporte"></div>
+        <div class="estado-foto" ${elegido === "completado" ? "" : "hidden"}>
+            <label class="estado-foto-label" for="fotoOperario">Foto de evidencia de recolección</label>
+            <input id="fotoOperario" type="file" accept="image/png,image/jpeg,image/webp">
+            <div class="file-help">Al completar el reporte debes adjuntar una foto del operario. Se verá junto a la foto del ciudadano.</div>
+        </div>
         <div class="confirmation-note">Puedes corregir el estado las veces que necesites. Se notificará al ciudadano y a la empresa.</div>
         <div class="modal-actions split-actions">
             <button class="secondary" type="button" data-accion="cerrarDetalles">Cancelar</button>
@@ -116,12 +121,17 @@ async function confirmarCambioEstado(id) {
     button.textContent = "Actualizando...";
 
     try {
-        const response = await features.apiFetch(`${API}/api/reportes/${id}/estado`, {
+        const form = new FormData();
+        form.append("estado", elegido);
+
+        const archivo = document.getElementById("fotoOperario")?.files?.[0];
+        if (archivo) form.append("foto", archivo);
+
+        const response = await fetch(`${API}/api/reportes/${id}/estado`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ estado: elegido, operario_id: usuarioActual.id })
+            body: form
         });
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.mensaje || "No se pudo actualizar el estado.");
 
         await cargarReportes(true);

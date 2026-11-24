@@ -101,10 +101,12 @@ async function crearReporteCiudadano(datos) {
  * @param {number} datos.reporteId - Reporte a actualizar.
  * @param {number} datos.operarioId - Operario autenticado.
  * @param {string} datos.estado - `en proceso` o `completado`.
+ * @param {string} [datos.imagenOperarioUrl] - Ruta `/uploads/...` de la
+ *        foto que el operario adjunta al completar el reporte.
  * @returns {Promise<object>} Reporte actualizado.
  * @throws {ErrorServicio} Si el estado no es válido o el reporte no pertenece al operario.
  */
-async function cambiarEstadoReporte({ reporteId, operarioId, estado }) {
+async function cambiarEstadoReporte({ reporteId, operarioId, estado, imagenOperarioUrl = null }) {
     if (!['en proceso', 'completado'].includes(estado)) {
         throw new ErrorServicio('Estado no válido.', 400, 'ESTADO_INVALIDO');
     }
@@ -114,7 +116,8 @@ async function cambiarEstadoReporte({ reporteId, operarioId, estado }) {
             reporteId,
             operarioId,
             estado,
-            cliente
+            cliente,
+            imagenOperarioUrl
         );
 
         if (!actualizado) {

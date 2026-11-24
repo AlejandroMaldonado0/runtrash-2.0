@@ -275,16 +275,17 @@ async function asignarAutomaticamente(reporteId, operarioId, cliente = pool) {
  * @param {import('pg').Pool|import('pg').PoolClient} [cliente=pool] - Ejecutor de la consulta.
  * @returns {Promise<object|null>}
  */
-async function actualizarEstado(reporteId, operarioId, estado, cliente = pool) {
+async function actualizarEstado(reporteId, operarioId, estado, cliente = pool, imagenOperarioUrl = null) {
     const resultado = await cliente.query(
         `
         UPDATE reportes
-        SET estado = $1
-        WHERE id = $2
-          AND operario_id = $3
+        SET estado = $1,
+            imagen_operario_url = CASE WHEN $1::varchar = 'completado'::varchar THEN $2::varchar ELSE NULL END
+        WHERE id = $3
+          AND operario_id = $4
         RETURNING *
         `,
-        [estado, reporteId, operarioId]
+        [estado, imagenOperarioUrl, reporteId, operarioId]
     );
 
     return resultado.rows[0] || null;
