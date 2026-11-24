@@ -5,6 +5,13 @@
 # La base de datos y las claves se configuran en el panel de
 # Render (Environment), NO se escriben aquí.
 #
+# Solo se piden TRES valores al desplegar:
+#   DATABASE_URL, ADMIN_EMAIL y ADMIN_PASSWORD
+#
+# Google/Outlook y el almacenamiento de fotos son opcionales: se
+# activan después desde Render > Environment cuando el dueño tenga
+# sus credenciales reales.
+#
 # Documentación paso a paso: DEPLOY.md
 # =========================================================
 
@@ -39,35 +46,25 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-      # Opcional: ingreso con Google y Outlook (OAuth 2.0).
-      # Deja los secretos vacíos para ocultar los botones OAuth.
-      - key: OAUTH_BASE_URL
-        sync: false
-      - key: OAUTH_STATE_SECRET
-        sync: false
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: MICROSOFT_CLIENT_ID
-        sync: false
-      - key: MICROSOFT_CLIENT_SECRET
-        sync: false
       # El envio de correo no esta implementado. No expongas el codigo
       # de recuperacion en produccion: permitiria tomar cuentas ajenas.
       - key: EXPOSER_CODIGO_RECUPERACION
         value: "false"
-      # Las fotos NO se deben guardar en el disco de Render (es temporal).
-      # Pon estos 3 valores de Neon Object Storage para que persistan.
-      - key: STORAGE_PROVIDER
-        value: s3
-      - key: STORAGE_S3_ENDPOINT
-        sync: false
-      - key: STORAGE_S3_BUCKET
-        value: uploads
-      - key: STORAGE_S3_REGION
-        value: us-east-2
-      - key: STORAGE_S3_ACCESS_KEY_ID
-        sync: false
-      - key: STORAGE_S3_SECRET_ACCESS_KEY
-        sync: false
+      # Las fotos se guardan en el disco local de Render. Es temporal:
+      # se pierden en cada redespliegue. Para que persistan, agrega en
+      # Render > Environment estas variables de Neon Object Storage:
+      #   STORAGE_PROVIDER=s3
+      #   STORAGE_S3_ENDPOINT=...
+      #   STORAGE_S3_BUCKET=uploads
+      #   STORAGE_S3_REGION=us-east-2
+      #   STORAGE_S3_ACCESS_KEY_ID=...
+      #   STORAGE_S3_SECRET_ACCESS_KEY=...
+      #
+      # Ingreso con Google y Outlook (opcional). Cuando tengas las
+      # credenciales reales, agrega en Render > Environment:
+      #   OAUTH_BASE_URL=https://TU-SERVICIO.onrender.com
+      #   OAUTH_STATE_SECRET=<cadena larga y aleatoria>
+      #   GOOGLE_CLIENT_ID=...
+      #   GOOGLE_CLIENT_SECRET=...
+      #   MICROSOFT_CLIENT_ID=...
+      #   MICROSOFT_CLIENT_SECRET=...
