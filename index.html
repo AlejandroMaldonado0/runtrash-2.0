@@ -282,14 +282,26 @@
                 Contraseña
             </label>
 
-            <input
-                type="password"
-                id="password"
-                name="password"
-                autocomplete="current-password"
-                placeholder="Ingresa tu contraseña"
-                required
-            >
+            <div class="password-field">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Ingresa tu contraseña"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="password-toggle"
+                    data-accion="togglePassword"
+                    data-target="password"
+                    aria-label="Mostrar contraseña"
+                >👁</button>
+
+            </div>
 
             <div class="forgot">
 
@@ -584,13 +596,25 @@
                     Contraseña
                 </label>
 
-                <input
-                    type="password"
-                    id="registroPassword"
-                    minlength="8"
-                    autocomplete="new-password"
-                    placeholder="Mínimo 8 caracteres, con letras y números"
-                >
+                <div class="password-field">
+
+                    <input
+                        type="password"
+                        id="registroPassword"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Mínimo 8 caracteres, con letras y números"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-accion="togglePassword"
+                        data-target="registroPassword"
+                        aria-label="Mostrar contraseña"
+                    >👁</button>
+
+                </div>
 
             </div>
 
@@ -600,13 +624,25 @@
                     Confirmar contraseña
                 </label>
 
-                <input
-                    type="password"
-                    id="registroPassword2"
-                    minlength="8"
-                    autocomplete="new-password"
-                    placeholder="Repite la contraseña"
-                >
+                <div class="password-field">
+
+                    <input
+                        type="password"
+                        id="registroPassword2"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Repite la contraseña"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-accion="togglePassword"
+                        data-target="registroPassword2"
+                        aria-label="Mostrar contraseña"
+                    >👁</button>
+
+                </div>
 
             </div>
 
@@ -721,28 +757,46 @@
         <form class="recuperacion-paso" id="pasoNuevaClave" novalidate hidden>
             <div class="input-group">
                 <label for="nuevaPassword">Nueva contraseña</label>
-                <input
-                    type="password"
-                    id="nuevaPassword"
-                    name="nuevaPassword"
-                    placeholder="Mínimo 8 caracteres, con letras y números"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
+                <div class="password-field">
+                    <input
+                        type="password"
+                        id="nuevaPassword"
+                        name="nuevaPassword"
+                        placeholder="Mínimo 8 caracteres, con letras y números"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-accion="togglePassword"
+                        data-target="nuevaPassword"
+                        aria-label="Mostrar contraseña"
+                    >👁</button>
+                </div>
             </div>
 
             <div class="input-group">
                 <label for="confirmarPassword">Repetir contraseña</label>
-                <input
-                    type="password"
-                    id="confirmarPassword"
-                    name="confirmarPassword"
-                    placeholder="Repite la contraseña"
-                    autocomplete="new-password"
-                    minlength="8"
-                    required
-                >
+                <div class="password-field">
+                    <input
+                        type="password"
+                        id="confirmarPassword"
+                        name="confirmarPassword"
+                        placeholder="Repite la contraseña"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-accion="togglePassword"
+                        data-target="confirmarPassword"
+                        aria-label="Mostrar contraseña"
+                    >👁</button>
+                </div>
             </div>
 
             <div class="modal-actions split-actions">

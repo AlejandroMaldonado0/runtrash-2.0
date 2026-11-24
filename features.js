@@ -717,4 +717,27 @@
     window.claseEstado = (estado) => RunTrashFeatures.claseEstado(estado);
     window.fechaBonita = (fecha) => RunTrashFeatures.fechaBonita(fecha);
     window.reporteSeguro = (reporte) => RunTrashFeatures.reporteSeguro(reporte);
+
+    /*
+    Alterna la visibilidad de los campos de contraseña con el ojito.
+    Los botones llevan `data-accion="togglePassword"` y `data-target="<id>"`.
+    */
+    document.addEventListener("click", (evento) => {
+        const boton = evento.target instanceof Element
+            ? evento.target.closest("[data-accion='togglePassword']")
+            : null;
+
+        if (!boton) return;
+
+        const campo = document.getElementById(boton.dataset.target || "");
+        if (!campo || !/^(password|text)$/.test(campo.type)) return;
+
+        const visible = campo.type === "text";
+        campo.type = visible ? "password" : "text";
+        boton.textContent = visible ? "\u{1F441}" : "\u{1F441}\u200D\u{1F648}";
+        boton.setAttribute(
+            "aria-label",
+            visible ? "Mostrar contraseña" : "Ocultar contraseña"
+        );
+    });
 })();

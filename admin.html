@@ -27,7 +27,7 @@
         <p>Ingresa las credenciales de administrador para continuar.</p>
         <form id="adminLoginForm" data-accion="iniciarSesionAdmin" data-pasar="evento">
             <div class="input-group"><label for="adminLoginEmail">Correo</label><input id="adminLoginEmail" type="email" autocomplete="username" required></div>
-            <div class="input-group"><label for="adminLoginPassword">Contraseña</label><input id="adminLoginPassword" type="password" autocomplete="current-password" required></div>
+            <div class="input-group"><label for="adminLoginPassword">Contraseña</label><div class="password-field"><input id="adminLoginPassword" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-accion="togglePassword" data-target="adminLoginPassword" aria-label="Mostrar contraseña">👁</button></div></div>
             <div class="mensaje error" id="adminLoginMessage" hidden></div>
             <button class="admin-primary-button full-admin-button" id="adminLoginButton" type="submit">Entrar al panel</button>
         </form>

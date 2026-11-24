@@ -1380,3 +1380,39 @@
         display: none;
     }
 }
+
+/* =========================================================
+   14. CONTRASEÑAS CON OJITO
+   ========================================================= */
+
+.input-group .password-field {
+    position: relative;
+}
+
+.input-group .password-field input {
+    padding-right: 46px;
+}
+
+.input-group .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(46, 125, 50, 0.35);
+    border-radius: 9px;
+    background: rgba(46, 125, 50, 0.08);
+    color: #2e7d32;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.input-group .password-toggle:hover {
+    background: rgba(46, 125, 50, 0.16);
+}
+
