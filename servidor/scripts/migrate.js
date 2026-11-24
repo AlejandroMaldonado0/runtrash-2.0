@@ -28,15 +28,7 @@ const { Pool } = require('pg');
 
 const EN_PRODUCCION = String(process.env.NODE_ENV || '').toLowerCase() === 'production';
 const SEMBRAR_DEMO = String(process.env.SEED_DEMO_ACCOUNTS || '').toLowerCase() === 'true';
-
-/**
- * Las migraciones con `_demo` en el nombre crean cuentas con contraseñas
- * conocidas. En producción solo se aplican con SEED_DEMO_ACCOUNTS=true.
- *
- * @param {string} archivo - Nombre del archivo de migración.
- * @returns {boolean} `true` si siembra cuentas de demostración.
- */
-const esMigracionDemo = (archivo) => /_demo[a-z0-9_]*\.sql$/i.test(archivo);
+const MIGRACION_DEMO = '007_cuentas_demo.sql';
 
 const connectionString = String(process.env.DATABASE_URL || '').trim();
 const rechazarCertificado = String(
@@ -101,7 +93,7 @@ async function migrate() {
             se omiten salvo que se pida de forma explícita con
             SEED_DEMO_ACCOUNTS=true.
             */
-            if (EN_PRODUCCION && esMigracionDemo(file) && !SEMBRAR_DEMO) {
+            if (EN_PRODUCCION && file === MIGRACION_DEMO && !SEMBRAR_DEMO) {
                 console.log(`↷ ${file} omitida en producción (SEED_DEMO_ACCOUNTS=false)`);
                 continue;
             }

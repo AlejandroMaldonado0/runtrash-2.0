@@ -50,11 +50,6 @@ services:
       # de recuperacion en produccion: permitiria tomar cuentas ajenas.
       - key: EXPOSER_CODIGO_RECUPERACION
         value: "false"
-      # Cuentas de demostracion (OPCIONAL). Si lo activas, se crean las
-      # cuentas @runtrash.test con contrasenas conocidas. Usalo solo
-      # para una demostracion y desactivalo despues.
-      #   SEED_DEMO_ACCOUNTS=true
-      # Credenciales: ver DEPLOY.md, seccion "Cuentas de demostracion".
       # Las fotos se guardan en el disco local de Render. Es temporal:
       # se pierden en cada redespliegue. Para que persistan, agrega en
       # Render > Environment estas variables de Neon Object Storage:
