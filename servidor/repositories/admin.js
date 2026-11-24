@@ -44,6 +44,8 @@ async function resumen() {
                 r.localidad,
                 r.estado,
                 r.fecha,
+                r.imagen_url,
+                r.imagen_operario_url,
                 u.nombre AS ciudadano,
                 o.nombre AS operario
             FROM reportes r

@@ -20,6 +20,7 @@ function verReporte(id) {
             <div><span class="status ${claseEstado(report.estado)}">${textoEstado(report.estado)}</span><h3>${item.tipo}</h3><p>${fechaBonita(report.fecha)}</p></div>
         </div>
         ${report.imagen_url ? features.reporteImagen(API, report, "detail-image", iconoTipo(report.tipo)) : ""}
+        ${report.imagen_operario_url ? features.reporteImagen(API, { ...report, imagen_url: report.imagen_operario_url }, "detail-image", iconoTipo(report.tipo)) : ""}
         <div class="detail-grid">
             <div class="detail-row"><span class="detail-label">Localidad</span><div class="detail-value">📍 ${item.localidad}</div></div>
             <div class="detail-row"><span class="detail-label">Ubicación</span><div class="detail-value">🧭 ${item.ubicacion}</div></div>

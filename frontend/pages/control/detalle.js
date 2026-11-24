@@ -40,6 +40,7 @@ async function verReporte(id) {
             </div>
 
             ${reporte.imagen_url ? `<div class="report-detail-image">${features.reporteImagen(API, reporte, "detail-thumb", "🗑️")}</div>` : ""}
+            ${reporte.imagen_operario_url ? `<div class="report-detail-image">${features.reporteImagen(API, { ...reporte, imagen_url: reporte.imagen_operario_url }, "detail-thumb", "🗑️")}</div>` : ""}
 
             <h4 class="modal-section-title">Historial de seguimientos${esAdmin ? "" : ` · ${features.escapeHTML(nombreEnte)}`}</h4>
             <p class="section-subtitle">${esAdmin
