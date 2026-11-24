@@ -32,16 +32,31 @@ services:
       # Necesario para que los limites de peticiones funcionen detras del proxy
       - key: TRUST_PROXY
         value: "true"
-      # La clave del administrador (minimo 8 caracteres)
+      # La clave del administrador (8+ caracteres, con letras y números)
       - key: ADMIN_NAME
         value: Administrador RunTrash
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
-      # Sin servidor de correo, el codigo se muestra en pantalla
+      # Opcional: ingreso con Google y Outlook (OAuth 2.0).
+      # Deja los secretos vacíos para ocultar los botones OAuth.
+      - key: OAUTH_BASE_URL
+        sync: false
+      - key: OAUTH_STATE_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+      # El envio de correo no esta implementado. No expongas el codigo
+      # de recuperacion en produccion: permitiria tomar cuentas ajenas.
       - key: EXPOSER_CODIGO_RECUPERACION
-        value: "true"
+        value: "false"
       # Las fotos NO se deben guardar en el disco de Render (es temporal).
       # Pon estos 3 valores de Neon Object Storage para que persistan.
       - key: STORAGE_PROVIDER

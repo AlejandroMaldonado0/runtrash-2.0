@@ -1,0 +1,330 @@
+/* =========================================================
+   RUNTRASH · REFINAMIENTO RESPONSIVE, ACCESIBILIDAD E IMPRESION
+   Modulo: frontend/styles/10-responsive-refinado.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   RUNTRASH · RESPONSIVE REFINEMENT
+   Objetivo tactil minimo 44px, sin scroll horizontal
+   y adaptation a cualquier pantalla.
+   ========================================================= */
+
+/* --- 1. Base: evitar rebote y desbordes en toda la app --- */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* --- 2. Objetivos tactiles comodos en pantallas pequenas --- */
+@media (pointer: coarse), (max-width: 900px) {
+
+    /* Enlaces en linea del login: area pulsable sin romper el diseno */
+    .auth-page .link-button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+        padding: 8px 4px;
+    }
+
+    /* Acciones de tabla del administrador */
+    .table-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 9px 12px;
+        font-size: 10px;
+    }
+
+    .table-actions {
+        gap: 7px;
+    }
+
+    /* Filtros del mapa y chips de estado */
+    .map-filter {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 10px 15px;
+        font-size: 11px;
+    }
+
+    /* Controles del mapa */
+    .leaflet-control-zoom a {
+        width: 40px !important;
+        height: 40px !important;
+        line-height: 40px !important;
+        font-size: 17px;
+    }
+
+    /* Controles del mapa */
+    .leaflet-control-zoom a {
+        width: 40px !important;
+        height: 40px !important;
+        line-height: 40px !important;
+        font-size: 17px;
+    }
+
+    /* Boton de recarga del panel de reportes visibles */
+    .map-panel-header button {
+        min-width: 40px;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .leaflet-control-attribution {
+        font-size: 9px;
+    }
+}
+
+/* --- 3. Pantanas muy angostas (320 - 359 px) --- */
+@media (max-width: 359px) {
+
+    .dashboard-page .main {
+        padding: 12px 11px 30px;
+    }
+
+    .topbar {
+        gap: 9px;
+    }
+
+    .welcome h1 {
+        font-size: 17px;
+    }
+
+    /* Filtros del mapa: pasan a varias lineas en vez de scroll */
+    .map-filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        gap: 6px;
+    }
+
+    .map-filter {
+        flex: 1 1 auto;
+    }
+
+    .stats {
+        gap: 11px;
+    }
+
+    .stat-card {
+        padding: 14px 12px;
+    }
+
+    .auth-page .container {
+        border-radius: 20px;
+    }
+
+    .auth-page .right {
+        padding: 24px 16px 26px;
+    }
+
+    .tipo-btn {
+        padding: 12px 6px;
+        font-size: 10px;
+    }
+
+    .admin-hero {
+        padding: 20px 16px;
+    }
+
+    .admin-hero h1 {
+        font-size: 19px;
+    }
+
+    .report-item {
+        padding: 12px 11px;
+    }
+
+    .section {
+        padding: 15px 13px;
+    }
+}
+
+/* --- 4. Telefonos: los filtros del mapa se reparten en lineas --- */
+@media (max-width: 560px) {
+
+    .map-filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        row-gap: 7px;
+    }
+
+    .map-filter {
+        flex: 1 1 auto;
+        min-width: fit-content;
+    }
+
+    .company-map-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* En movil la lista lateral pasa debajo del mapa */
+    .map-report-panel {
+        max-height: none;
+    }
+
+    .map-panel-list {
+        max-height: 320px;
+    }
+
+    .map-shell {
+        min-height: 300px;
+        height: 320px;
+    }
+
+    /* Tarjeta de hotspot mas compacta */
+    .map-hotspot-card {
+        padding: 12px 13px;
+    }
+
+    .map-hotspot-card strong {
+        font-size: 14px;
+    }
+}
+
+/* --- 5. Tablets en horizontal: sidebar compacta --- */
+@media (min-width: 821px) and (max-width: 1100px) {
+
+    .dashboard-page .sidebar {
+        width: 232px;
+    }
+
+    .dashboard-page .menu a {
+        padding: 12px 13px;
+        font-size: 12px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .company-map-layout {
+        grid-template-columns: minmax(0, 1fr) 232px;
+    }
+}
+
+/* --- 6. Pantallas grandes: limita el ancho para legibilidad --- */
+@media (min-width: 1700px) {
+
+    .dashboard-page .main {
+        max-width: 1560px;
+    }
+
+    .auth-page > .container {
+        max-width: 1180px;
+    }
+}
+
+/* --- 7. Moviles en horizontal (altura corta) --- */
+@media (max-height: 520px) and (orientation: landscape) {
+
+    .auth-page {
+        align-items: flex-start;
+        padding: 14px 0;
+    }
+
+    .auth-page > .container {
+        margin: 14px auto;
+    }
+
+    .auth-page .left {
+        padding: 20px 18px;
+    }
+
+    .auth-page .right {
+        padding: 22px 20px;
+    }
+
+    /* El panel lateral ocupa toda la altura en horizontal */
+    .dashboard-page .sidebar {
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        overflow-y: auto;
+    }
+}
+
+/* --- 8. Tabla admin: pista visual de scroll en movil --- */
+@media (max-width: 900px) {
+
+    .admin-table-wrap {
+        position: relative;
+        border-radius: 14px;
+    }
+
+    .admin-table-wrap::after {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 34px;
+        content: "";
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(214, 231, 219, 0.85));
+        border-radius: 0 14px 14px 0;
+        pointer-events: none;
+    }
+
+    /* La primera columna se mantiene fija al desplazar */
+    .admin-table th:first-child,
+    .admin-table td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: #fff;
+        box-shadow: 1px 0 0 var(--line);
+    }
+
+    .admin-table th:first-child {
+        background: #f7faf8;
+    }
+}
+
+/* --- 9. Respeto por preferences de movimiento y contraste --- */
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* --- 10. Impresion: sin barra lateral ni controles --- */
+@media print {
+
+    .dashboard-page .sidebar,
+    .dashboard-page .topbar-actions,
+    .dashboard-page .menu-toggle,
+    .notification,
+    .toast,
+    .sidebar-backdrop {
+        display: none !important;
+    }
+
+    .dashboard-page .main {
+        max-width: none;
+        padding: 0;
+    }
+
+    .report-card,
+    .assignment-card,
+    .section,
+    .stat-card {
+        box-shadow: none;
+        break-inside: avoid;
+    }
+}

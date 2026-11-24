@@ -7,6 +7,8 @@ npm-debug.log*
 .env.local
 .env.production
 servidor/.env
+servidor/.credenciales-demo.local.md
+.credenciales-demo.local.md
 
 # Fotos de los reportes (se regeneran en cada despliegue)
 servidor/uploads/*

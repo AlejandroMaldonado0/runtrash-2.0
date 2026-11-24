@@ -1,0 +1,1562 @@
+/* =========================================================
+   RUNTRASH · PERFIL CIUDADANO GAMIFICADO
+   Capa final del rediseño del perfil compartido. Añade la
+   cabecera degradada, la tarjeta de XP, las métricas, el
+   historial en tarjetas y la credencial del pie.
+   Se importa al final de styles.css para ganar la cascada.
+   ========================================================= */
+
+/* ---------- 1. Emojis por rol en el acceso ---------- */
+
+.auth-page .tipo-btn::before {
+    content: "👤";
+    font-size: 15px;
+    line-height: 1;
+}
+
+.auth-page .tipo-btn[data-tipo="empresa"]::before {
+    content: "🏢";
+}
+
+.auth-page .tipo-btn[data-tipo="operario"]::before {
+    content: "👷";
+}
+
+.auth-page .tipo-btn[data-tipo="distrito"]::before {
+    content: "🏛️";
+}
+
+.auth-page .tipo-btn[data-tipo="policia"]::before {
+    content: "🚓";
+}
+
+.auth-page .tipo-btn[data-tipo="sspd"]::before {
+    content: "⚖️";
+}
+
+.auth-page .tipo-btn[data-tipo="empresa"]:not(.active)::before {
+    background: #f1ecff;
+}
+
+.auth-page .tipo-btn[data-tipo="operario"]:not(.active)::before {
+    background: #eaf7ef;
+}
+
+.auth-page .tipo-btn[data-tipo="distrito"]:not(.active)::before {
+    background: #e6f2fb;
+}
+
+.auth-page .tipo-btn[data-tipo="policia"]:not(.active)::before {
+    background: #e9f5ee;
+}
+
+.auth-page .tipo-btn[data-tipo="sspd"]:not(.active)::before {
+    background: #f2eafc;
+}
+
+.auth-page .roles-grid .tipo-btn {
+    justify-content: flex-start;
+    padding-left: 10px;
+}
+
+.role-badge {
+    gap: 4px;
+}
+
+/* ---------- 2. Cáscara del modal de perfil ---------- */
+
+.dashboard-page .modal-card.profile-modal-card {
+    max-width: 650px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.profile-modal-card > .modal-header {
+    display: none;
+}
+
+.profile-modal-card .perfil-v2 {
+    max-height: calc(100vh - 44px);
+    max-height: calc(100dvh - 44px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fff;
+    scrollbar-width: thin;
+    scrollbar-color: #10b981 #eef2f5;
+}
+
+.profile-modal-card .perfil-v2::-webkit-scrollbar {
+    width: 10px;
+}
+
+.profile-modal-card .perfil-v2::-webkit-scrollbar-track {
+    background: #eef2f5;
+    border-radius: 999px;
+}
+
+.profile-modal-card .perfil-v2::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #34d399, #0f766e);
+    background-clip: padding-box;
+    border: 2px solid #eef2f5;
+    border-radius: 999px;
+}
+
+.profile-modal-card .perfil-v2::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #10b981, #115e59);
+    background-clip: padding-box;
+    border: 2px solid #eef2f5;
+}
+
+/* ---------- 3. Colores por rol ---------- */
+
+.perfil-rol-ciudadano {
+    --rol: #0f7a4a;
+    --rol-suave: #e8f8ef;
+    --rol-borde: #c8e8d5;
+}
+
+.perfil-rol-empresa {
+    --rol: #6b4bb0;
+    --rol-suave: #f3edff;
+    --rol-borde: #ddd1f4;
+}
+
+.perfil-rol-operario {
+    --rol: #a8640b;
+    --rol-suave: #fff6e8;
+    --rol-borde: #f0dcb8;
+}
+
+.perfil-rol-admin {
+    --rol: #8a5b0a;
+    --rol-suave: #fff6df;
+    --rol-borde: #ecdbad;
+}
+
+.perfil-rol-distrito {
+    --rol: #1f5f8b;
+    --rol-suave: #eaf5fc;
+    --rol-borde: #cde4f3;
+}
+
+.perfil-rol-policia {
+    --rol: #1f6b3c;
+    --rol-suave: #eaf7ef;
+    --rol-borde: #cfe9d8;
+}
+
+.perfil-rol-sspd {
+    --rol: #6a3d8f;
+    --rol-suave: #f6eefc;
+    --rol-borde: #e3d3f2;
+}
+
+.perfil-rol-usuario {
+    --rol: #0f7a4a;
+    --rol-suave: #eef9f2;
+    --rol-borde: #d6eadc;
+}
+
+/* ---------- 4. Cabecera degradada ---------- */
+
+.perfil-v2 {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+/*
+El modal limita la altura y deja que `.perfil-v2` haga scroll. Sin
+`flex-shrink: 0` la cabecera se comprime y el avatar se recorta.
+*/
+.perfil-v2 > .perfil-hero,
+.perfil-v2 > .perfil-cuerpo {
+    flex: 0 0 auto;
+}
+
+.perfil-hero {
+    position: relative;
+    padding: 16px 20px 52px;
+    overflow: hidden;
+    color: #fff;
+    background: linear-gradient(135deg, #059669 0%, #047857 52%, #115e59 100%);
+    isolation: isolate;
+}
+
+.perfil-hero::before {
+    position: absolute;
+    top: -92px;
+    right: -64px;
+    width: 220px;
+    height: 220px;
+    content: "";
+    border: 22px solid rgba(255, 255, 255, 0.09);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.perfil-hero::after {
+    position: absolute;
+    bottom: -110px;
+    left: -70px;
+    width: 240px;
+    height: 240px;
+    content: "";
+    background: rgba(190, 242, 100, 0.12);
+    border-radius: 50%;
+    filter: blur(26px);
+    pointer-events: none;
+}
+
+.perfil-hero-adorno {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 38px 38px;
+    pointer-events: none;
+}
+
+.perfil-hero-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.perfil-hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    color: #ecfdf5;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+}
+
+.perfil-hero-punto {
+    width: 6px;
+    height: 6px;
+    background: #bef264;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(190, 242, 100, 0.18);
+}
+
+.perfil-hero-cerrar {
+    display: grid;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    place-items: center;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-family: inherit;
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 180ms ease, background 180ms ease;
+}
+
+.perfil-hero-cerrar:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: rotate(90deg);
+}
+
+.perfil-hero-cerrar:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+.perfil-hero-cuerpo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    margin-top: 16px;
+}
+
+/* ---------- 5. Avatar con marco dorado ---------- */
+
+.perfil-avatar-wrap {
+    position: relative;
+    flex: 0 0 auto;
+    width: 96px;
+    padding-top: 2px;
+    text-align: center;
+}
+
+.perfil-avatar-marco {
+    display: inline-block;
+    padding: 4px;
+    background: linear-gradient(135deg, #fcd34d, #fef9c3 48%, #f59e0b);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 5px rgba(255, 255, 255, 0.08),
+        0 16px 30px rgba(2, 44, 34, 0.35);
+}
+
+.perfil-avatar {
+    position: relative;
+    display: grid;
+    width: 86px;
+    height: 86px;
+    padding: 0;
+    overflow: hidden;
+    place-items: center;
+    color: #064e3b;
+    background: linear-gradient(135deg, #bef264, #34d399);
+    border: 3px solid #065f46;
+    border-radius: 50%;
+    font-family: inherit;
+    font-size: 31px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.perfil-avatar:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 26px rgba(2, 44, 34, 0.35);
+}
+
+.perfil-avatar:focus-visible {
+    outline: 3px solid rgba(252, 211, 77, 0.75);
+    outline-offset: 3px;
+}
+
+.perfil-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.perfil-avatar.is-loading {
+    pointer-events: none;
+    filter: saturate(0.6);
+    animation: perfil-pulso 900ms ease-in-out infinite alternate;
+}
+
+.perfil-avatar-cam {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    display: grid;
+    width: 25px;
+    height: 25px;
+    place-items: center;
+    background: #fff;
+    border: 2px solid #065f46;
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.24);
+    font-size: 11px;
+    line-height: 1;
+}
+
+.perfil-avatar-nivel {
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    display: grid;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 5px;
+    place-items: center;
+    color: #78350f;
+    background: #fcd34d;
+    border: 2px solid #065f46;
+    border-radius: 999px;
+    box-shadow: 0 6px 14px rgba(2, 44, 34, 0.3);
+    font-size: 10px;
+    font-weight: 950;
+}
+
+.perfil-avatar-quitar {
+    display: block;
+    width: 100%;
+    margin-top: 7px;
+    padding: 0;
+    color: #d1fae5;
+    background: none;
+    border: 0;
+    font-family: inherit;
+    font-size: 8.5px;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    opacity: 0.85;
+}
+
+.perfil-avatar-quitar:hover {
+    color: #fff;
+    opacity: 1;
+}
+
+.perfil-avatar-quitar[hidden] {
+    display: none;
+}
+
+.perfil-avatar-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---------- 6. Identidad ---------- */
+
+.perfil-identidad-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.perfil-rol-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    color: #fff;
+    background: var(--rol, var(--brand-700));
+    border-radius: 999px;
+    box-shadow: 0 6px 14px rgba(2, 44, 34, 0.22);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.perfil-identidad-info h3 {
+    margin: 1px 0 0;
+    color: #fff;
+    font-size: clamp(21px, 3.4vw, 27px);
+    font-weight: 850;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.perfil-correo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    color: rgba(236, 253, 245, 0.86);
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.perfil-nivel {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0 0;
+    padding: 5px 10px;
+    color: #fef3c7;
+    background: rgba(252, 211, 77, 0.16);
+    border: 1px solid rgba(252, 211, 77, 0.42);
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 850;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+}
+
+.perfil-nivel span {
+    font-size: 10px;
+}
+
+.perfil-rol-descripcion {
+    max-width: 46ch;
+    margin: 3px 0 0;
+    color: rgba(236, 253, 245, 0.82);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+/* ---------- 7. Cuerpo y tarjeta de XP ---------- */
+
+.perfil-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px 18px 18px;
+    background: #f8fafc;
+}
+
+.perfil-cuerpo--xp {
+    margin-top: -36px;
+    padding-top: 0;
+}
+
+.perfil-xp {
+    position: relative;
+    z-index: 2;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #d1fae5;
+    border-radius: 18px;
+    box-shadow: 0 18px 38px rgba(6, 78, 59, 0.12);
+}
+
+.perfil-xp-cabecera {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.perfil-xp-icono {
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-radius: 13px;
+    box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.18);
+    font-size: 20px;
+}
+
+.perfil-xp-titulo {
+    min-width: 0;
+    flex: 1;
+}
+
+.perfil-xp-titulo > span {
+    display: block;
+    color: #047857;
+    font-size: 8.5px;
+    font-weight: 850;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.perfil-xp-titulo h4 {
+    margin: 1px 0 0;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: -0.015em;
+}
+
+.perfil-xp-objetivo {
+    margin: 2px 0 0;
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.perfil-xp-cifra {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 5px 10px;
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.perfil-xp-cifra strong {
+    font-size: 16px;
+    font-weight: 950;
+}
+
+.perfil-xp-sep {
+    color: #94a3b8;
+    font-weight: 700;
+}
+
+.perfil-xp-cifra small {
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 850;
+}
+
+.perfil-xp-barra {
+    position: relative;
+    height: 12px;
+    margin-top: 12px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px #e2e8f0;
+}
+
+.perfil-xp-fill {
+    position: relative;
+    display: block;
+    width: 0;
+    height: 100%;
+    overflow: hidden;
+    background: linear-gradient(90deg, #10b981, #14b8a6 55%, #fbbf24);
+    border-radius: 999px;
+    transition: width 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.perfil-xp-fill::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    transform: translateX(-100%);
+    animation: perfil-brillo 2.6s ease-in-out infinite;
+}
+
+.perfil-xp-pie {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 10px;
+    margin-top: 7px;
+    color: #64748b;
+    font-size: 9.5px;
+    font-weight: 650;
+}
+
+.perfil-xp-pie strong {
+    color: #0f766e;
+    font-weight: 850;
+}
+
+.perfil-xp-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 11px;
+}
+
+.perfil-xp-chips span {
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 8.5px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.perfil-xp-chips .is-ambar {
+    color: #b45309;
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.perfil-xp-chips .is-verde {
+    color: #047857;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+.perfil-xp-chips .is-azul {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.perfil-xp-detalle {
+    margin-top: 9px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 11px;
+}
+
+.perfil-xp-detalle summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    color: #475569;
+    font-size: 9.5px;
+    font-weight: 850;
+    cursor: pointer;
+    list-style: none;
+}
+
+.perfil-xp-detalle summary::-webkit-details-marker {
+    display: none;
+}
+
+.perfil-xp-detalle summary:hover {
+    color: #047857;
+}
+
+.perfil-xp-flecha {
+    color: #94a3b8;
+    font-size: 9px;
+    transition: transform 180ms ease;
+}
+
+.perfil-xp-detalle[open] .perfil-xp-flecha {
+    transform: rotate(180deg);
+}
+
+.perfil-xp-reglas {
+    display: grid;
+    gap: 4px;
+    padding: 0 10px 10px;
+    color: #52617a;
+    font-size: 9px;
+    font-weight: 650;
+}
+
+.perfil-xp-reglas b {
+    color: #0f766e;
+    font-weight: 850;
+}
+
+/* ---------- 8. Resumen, KPIs y efectividad ---------- */
+
+.perfil-resumen {
+    padding: 14px;
+    background: #fff;
+    border: 1px solid #e3ebe6;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(10, 63, 37, 0.05);
+}
+
+.perfil-resumen-cabecera {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.perfil-resumen-eyebrow {
+    display: block;
+    color: #0f766e;
+    font-size: 8.5px;
+    font-weight: 850;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.perfil-resumen-cabecera h4 {
+    margin: 1px 0 0;
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+}
+
+.perfil-ver-todos {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    color: #0f766e;
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 850;
+    cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.perfil-ver-todos strong {
+    display: grid;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 4px;
+    place-items: center;
+    color: #fff;
+    background: #0f766e;
+    border-radius: 999px;
+    font-size: 8.5px;
+    font-weight: 900;
+}
+
+.perfil-ver-todos:hover,
+.perfil-ver-todos.is-active {
+    color: #fff;
+    background: #0f766e;
+    border-color: #0f766e;
+}
+
+.perfil-ver-todos.is-active strong {
+    color: #0f766e;
+    background: #fff;
+}
+
+.perfil-resumen-ayuda {
+    margin: 4px 0 0;
+    color: #94a3b8;
+    font-size: 8.5px;
+    font-weight: 600;
+}
+
+.perfil-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.perfil-kpi {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    padding: 10px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font-family: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.perfil-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.perfil-kpi:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, 0.35);
+    outline-offset: 1px;
+}
+
+.perfil-kpi strong {
+    margin-top: 5px;
+    font-size: 23px;
+    font-weight: 950;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.perfil-kpi-label {
+    font-size: 8.5px;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.perfil-kpi-icono {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 9px;
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06);
+    font-size: 14px;
+}
+
+.perfil-kpi.is-pendiente {
+    color: #b45309;
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.perfil-kpi.is-proceso {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.perfil-kpi.is-completado {
+    color: #047857;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+.perfil-kpi.is-active {
+    border-color: currentColor;
+    box-shadow: 0 0 0 2px currentColor, 0 10px 20px rgba(15, 23, 42, 0.08);
+}
+
+.perfil-efectividad {
+    margin-top: 8px;
+    padding: 10px 11px;
+    background: #fff;
+    border: 1px solid #eef2f5;
+    border-radius: 13px;
+}
+
+.perfil-efectividad-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: #64748b;
+    font-size: 8.5px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.perfil-efectividad-cabecera strong {
+    color: #0f766e;
+    font-size: 13px;
+    font-weight: 950;
+    letter-spacing: -0.01em;
+}
+
+.perfil-efectividad-barra {
+    height: 7px;
+    margin-top: 7px;
+    overflow: hidden;
+    background: #eef2f5;
+    border-radius: 999px;
+}
+
+.perfil-efectividad-barra > span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #34d399, #0d9488);
+    border-radius: 999px;
+    transition: width 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.perfil-efectividad p {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 8.5px;
+    font-weight: 650;
+}
+
+/* ---------- 9. Historial ---------- */
+
+.perfil-resumen-panel {
+    margin-top: 11px;
+}
+
+.perfil-lista-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.perfil-lista-cabecera strong {
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+}
+
+.perfil-lista-cabecera span {
+    color: #94a3b8;
+    font-size: 8.5px;
+    font-weight: 750;
+}
+
+.perfil-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.perfil-reporte {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #eef2f5;
+    border-radius: 13px;
+    box-shadow: 0 2px 6px rgba(10, 63, 37, 0.03);
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.perfil-reporte:hover {
+    border-color: #bbf7d0;
+    box-shadow: 0 12px 24px rgba(10, 63, 37, 0.09);
+    transform: translateY(-2px);
+}
+
+.perfil-reporte-icono {
+    display: grid;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 16px;
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+.perfil-reporte-icono.is-verde {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.perfil-reporte-icono.is-ambar {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.perfil-reporte-icono.is-agua {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.perfil-reporte-icono.is-neutro {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.perfil-reporte-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.perfil-reporte-fila {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.perfil-reporte-titulos {
+    min-width: 0;
+}
+
+.perfil-reporte-categoria {
+    display: block;
+    color: #0f766e;
+    font-size: 8px;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.perfil-reporte-titulo {
+    display: block;
+    margin-top: 1px;
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+.perfil-reporte-estado.status {
+    flex: 0 0 auto;
+    min-height: 0;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 8px;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.perfil-reporte-estado.status.pending {
+    color: #b45309;
+    background: #fef3c7;
+    border-color: #fde68a;
+}
+
+.perfil-reporte-estado.status.progress {
+    color: #1d4ed8;
+    background: #dbeafe;
+    border-color: #bfdbfe;
+}
+
+.perfil-reporte-estado.status.done {
+    color: #047857;
+    background: #d1fae5;
+    border-color: #a7f3d0;
+}
+
+.perfil-reporte-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px 10px;
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 8.5px;
+    font-weight: 600;
+}
+
+.perfil-reporte-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.perfil-resumen-vacio,
+.perfil-resumen-cargando {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 22px 14px;
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px dashed #dbe4ea;
+    border-radius: 13px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.perfil-resumen-vacio > span {
+    font-size: 22px;
+}
+
+.perfil-resumen-vacio strong {
+    color: #334155;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.perfil-resumen-vacio p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 9px;
+    line-height: 1.45;
+}
+
+.perfil-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d1fae5;
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: perfil-giro 700ms linear infinite;
+}
+
+/* ---------- 10. Guía del rol ---------- */
+
+.perfil-guia {
+    padding: 13px;
+    background: linear-gradient(135deg, #ffffff, var(--rol-suave, #eef9f2));
+    border: 1px solid var(--rol-borde, #d6eadc);
+    border-radius: 16px;
+}
+
+.perfil-guia-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 9px;
+}
+
+.perfil-guia-emoji {
+    display: grid;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    background: #fff;
+    border-radius: 11px;
+    box-shadow: 0 4px 10px rgba(10, 63, 37, 0.08);
+    font-size: 17px;
+}
+
+.perfil-guia-cabecera strong {
+    display: block;
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.perfil-guia-cabecera span {
+    color: var(--rol, var(--brand-700));
+    font-size: 9px;
+    font-weight: 750;
+}
+
+.perfil-guia-pasos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.perfil-guia-pasos li {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px;
+    color: #50685b;
+    background: #fff;
+    border: 1px solid #e6f0e9;
+    border-radius: 10px;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.perfil-guia-numero {
+    display: grid;
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    place-items: center;
+    color: #fff;
+    background: var(--rol, var(--brand-700));
+    border-radius: 999px;
+    font-size: 8.5px;
+    font-weight: 900;
+}
+
+/* ---------- 11. Credencial del pie ---------- */
+
+.perfil-datos {
+    padding: 12px;
+    background: #f8fbf9;
+    border: 1px solid #e3ebe6;
+    border-radius: 16px;
+}
+
+.perfil-datos-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 8px;
+}
+
+.perfil-datos-icono {
+    display: grid;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    background: #fff;
+    border: 1px solid #e3efe8;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.perfil-datos-cabecera strong {
+    flex: 1;
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.perfil-datos-estado {
+    padding: 3px 8px;
+    color: #047857;
+    background: #d1fae5;
+    border-radius: 999px;
+    font-size: 7.5px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.perfil-datos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 6px;
+}
+
+.perfil-dato {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 9px;
+    background: #fff;
+    border: 1px solid #e4efe8;
+    border-radius: 11px;
+}
+
+.perfil-dato-icono {
+    display: grid;
+    flex: 0 0 26px;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    background: #f8fcf9;
+    border: 1px solid #e3efe8;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.perfil-dato-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.perfil-dato-label {
+    color: #879a8f;
+    font-size: 7.5px;
+    font-weight: 850;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+}
+
+.perfil-dato-valor {
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- 12. Pie de acción ---------- */
+
+.perfil-pie {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.perfil-pie > * {
+    flex: 1;
+}
+
+.profile-modal-card .perfil-pie .secondary,
+.profile-modal-card .perfil-pie .admin-primary-button {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    color: #fff;
+    background: linear-gradient(135deg, #059669, #047857);
+    border: 1px solid #047857;
+    border-radius: 11px;
+    box-shadow: 0 10px 20px rgba(5, 150, 105, 0.22);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 850;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.profile-modal-card .perfil-pie .secondary:hover,
+.profile-modal-card .perfil-pie .admin-primary-button:hover {
+    background: linear-gradient(135deg, #047857, #065f46);
+    box-shadow: 0 14px 26px rgba(5, 150, 105, 0.3);
+    transform: translateY(-1px);
+}
+
+.profile-modal-card .perfil-pie .secondary:focus-visible,
+.profile-modal-card .perfil-pie .admin-primary-button:focus-visible {
+    outline: 3px solid rgba(16, 185, 129, 0.35);
+    outline-offset: 2px;
+}
+
+/* ---------- 13. Animaciones ---------- */
+
+@keyframes perfil-brillo {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    55%,
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes perfil-giro {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes perfil-pulso {
+    from {
+        opacity: 0.75;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ---------- 14. Pantallas pequeñas ---------- */
+
+@media (max-width: 620px) {
+    .perfil-hero {
+        padding: 14px 16px 48px;
+    }
+
+    .perfil-hero-cuerpo {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    .perfil-avatar-wrap {
+        width: auto;
+    }
+
+    .perfil-identidad-info {
+        align-items: center;
+    }
+
+    .perfil-rol-descripcion {
+        text-align: center;
+    }
+
+    .perfil-cuerpo {
+        padding: 14px 12px 14px;
+        gap: 11px;
+    }
+
+    .perfil-cuerpo--xp {
+        margin-top: -34px;
+        padding-top: 0;
+    }
+
+    .perfil-xp {
+        padding: 12px;
+    }
+
+    .perfil-xp-cabecera {
+        gap: 8px;
+    }
+
+    .perfil-xp-icono {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 17px;
+    }
+
+    .perfil-xp-titulo h4 {
+        font-size: 13px;
+    }
+
+    .perfil-xp-cifra {
+        font-size: 11px;
+    }
+
+    .perfil-xp-cifra strong {
+        font-size: 14px;
+    }
+
+    .perfil-resumen {
+        padding: 12px;
+    }
+
+    .perfil-kpi {
+        padding: 8px;
+    }
+
+    .perfil-kpi strong {
+        font-size: 20px;
+    }
+
+    .perfil-kpi-label {
+        font-size: 7.5px;
+    }
+
+    .perfil-kpi-icono {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .perfil-guia-pasos {
+        grid-template-columns: 1fr;
+    }
+
+    .perfil-datos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .perfil-reporte {
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .perfil-reporte-icono {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    .perfil-reporte-fila {
+        gap: 6px;
+    }
+
+    .perfil-reporte-titulo {
+        font-size: 11.5px;
+    }
+
+    .perfil-reporte-estado.status {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 400px) {
+    .perfil-hero-chip {
+        padding: 4px 8px;
+        font-size: 8px;
+        letter-spacing: 0.1em;
+    }
+
+    .perfil-xp-chips span {
+        font-size: 8px;
+    }
+
+    .perfil-kpis {
+        gap: 5px;
+    }
+
+    .perfil-kpi {
+        padding: 7px;
+    }
+
+    .perfil-kpi strong {
+        font-size: 18px;
+    }
+}
+
+/* ---------- 15. Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    .perfil-xp-fill,
+    .perfil-efectividad-barra > span,
+    .perfil-reporte,
+    .perfil-kpi,
+    .perfil-avatar,
+    .perfil-hero-cerrar {
+        transition-duration: 0.001ms !important;
+    }
+
+    .perfil-xp-fill::after,
+    .perfil-spinner,
+    .perfil-avatar.is-loading {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

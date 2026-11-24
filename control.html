@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#073c23">
+<meta name="description" content="Panel de control y seguimiento de reportes para Distrito, Policía y SSPD.">
+<link rel="icon" href="logos/logo.png" type="image/png">
+<title>RunTrash - Entes de control</title>
+<link rel="stylesheet" href="styles.css">
+<script src="config.js"></script>
+<script src="frontend/shared/api.js?v=20261120"></script>
+<script src="ui.js" defer></script>
+<script src="features.js" defer></script>
+<script src="frontend/shared/ui-common.js?v=20261120" defer></script>
+<script src="frontend/shared/concurrencia.js?v=20261120" defer></script>
+</head>
+<body class="dashboard-page role-admin">
+<a class="skip-link" href="#contenidoPrincipal">Saltar al contenido</a>
+
+<div class="app" id="controlApp" hidden>
+    <button class="sidebar-backdrop" type="button" data-sidebar-backdrop aria-label="Cerrar menú"></button>
+
+    <aside class="sidebar" id="sidebar" data-sidebar>
+        <button class="sidebar-close" type="button" data-sidebar-close aria-label="Cerrar menú">×</button>
+        <div class="sidebar-logo"><img src="logos/logo.png" alt="RunTrash"></div>
+        <div class="user-box">
+            <div class="user-icon" aria-hidden="true">⚖️</div>
+            <div class="user-info"><strong id="controlEnteNombre">Ente de control</strong><span>Seguimiento de reportes</span></div>
+        </div>
+        <div class="sidebar-impact">
+            <span class="sidebar-impact-icon" aria-hidden="true">🔎</span>
+            <div>
+                <strong>Vigilancia ciudadana</strong>
+                <span>Trazabilidad de cada reporte</span>
+            </div>
+        </div>
+        <nav class="menu" aria-label="Navegación de control">
+            <a href="#resumen" class="active" aria-current="page" data-accion="irA" data-pasar="elemento" data-args='["#resumen"]'><span class="menu-icon">📊</span>Resumen</a>
+            <a href="#reportes" data-accion="irA" data-pasar="elemento" data-args='["#reportes"]'><span class="menu-icon">📋</span>Reportes</a>
+            <a href="#" data-accion="mostrarPerfil"><span class="menu-icon">👤</span>Mi perfil</a>
+        </nav>
+        <div class="logout"><a href="index.html" data-accion="cerrarSesion"><span class="menu-icon">🚪</span>Cerrar sesión</a></div>
+    </aside>
+
+    <main class="main" id="contenidoPrincipal" tabindex="-1">
+        <div class="topbar">
+            <button class="menu-toggle" type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menú">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </button>
+            <div class="welcome"><div class="welcome-copy"><h1>Control y seguimiento</h1><p>Verifica que los reportes ciudadanos se atiendan correctamente.</p><span class="today" data-current-date></span></div></div>
+            <div class="topbar-actions">
+                <span class="service-status" id="systemStatus">Conectando</span>
+                <button class="notification" type="button" data-accion="mostrarNotificaciones" aria-label="Ver notificaciones">
+                    🔔
+                    <span class="notification-count" id="notificationCount" hidden>0</span>
+                </button>
+                <button class="notification" type="button" data-accion="refrescarTodo" aria-label="Actualizar panel">↻</button>
+            </div>
+        </div>
+
+        <section class="admin-hero" id="resumen">
+            <div>
+                <span class="admin-eyebrow">ENTE DE CONTROL</span>
+                <h2 id="controlHeroTitulo">Seguimiento de reportes</h2>
+                <p id="controlHeroTexto">Consulta el estado de los reportes y deja observaciones o requerimientos trazables.</p>
+                <ul class="hero-flow" aria-label="Flujo de control">
+                    <li><span>1</span>Consultas</li>
+                    <li><span>2</span>Verificas</li>
+                    <li><span>3</span>Observas</li>
+                    <li><span>4</span>Exportas</li>
+                </ul>
+            </div>
+            <button class="admin-primary-button" type="button" data-accion="exportarReportes">⬇ Exportar CSV</button>
+        </section>
+
+        <section class="stats admin-stats" aria-label="Resumen de reportes">
+            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><span>Total</span><strong id="controlTotal">0</strong></div></div>
+            <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><span>Pendientes</span><strong id="controlPendientes">0</strong></div></div>
+            <div class="stat-card"><div class="stat-icon">🚛</div><div class="stat-info"><span>En proceso</span><strong id="controlProceso">0</strong></div></div>
+            <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-info"><span>Completados</span><strong id="controlCompletados">0</strong></div></div>
+        </section>
+
+        <div class="estado-leyenda" aria-label="Guía de estados">
+            <span class="estado-leyenda-titulo">Estados</span>
+            <span class="estado-leyenda-chip is-pendiente"><i></i><strong>Pendiente</strong>: sin atender</span>
+            <span class="estado-leyenda-chip is-proceso"><i></i><strong>En proceso</strong>: en gestión</span>
+            <span class="estado-leyenda-chip is-completado"><i></i><strong>Completado</strong>: con cierre</span>
+        </div>
+
+        <section class="section admin-analytics">
+            <div class="section-header"><div><h2>Demanda por localidad</h2><p class="section-subtitle">Reportes acumulados por localidad.</p></div><span class="filter-badge" id="controlSeguimientosBadge">0 seguimientos</span></div>
+            <div class="sector-list" id="controlSectores"></div>
+        </section>
+
+        <section class="section" id="reportes">
+            <div class="section-header reports-header">
+                <div><h2>Reportes de la ciudad</h2><p class="section-subtitle">Filtra y abre cada reporte para revisar su trazabilidad.</p></div>
+                <div class="section-actions"><button class="toolbar-button" type="button" data-accion="refrescarTodo">↻ Actualizar</button></div>
+            </div>
+
+            <form class="config-form" id="controlFiltros" data-accion="cargarReportes">
+                <label><span>Estado</span><select id="filtroEstado"><option value="">Todos</option><option value="pendiente">Pendiente</option><option value="en proceso">En proceso</option><option value="completado">Completado</option></select></label>
+                <label><span>Localidad</span><select id="filtroLocalidad"><option value="">Todas</option></select></label>
+                <label><span>Buscar</span><input id="filtroTexto" type="search" placeholder="Tipo, descripción, dirección o ciudadano"></label>
+                <label><span>Desde</span><input id="filtroDesde" type="date"></label>
+                <label><span>Hasta</span><input id="filtroHasta" type="date"></label>
+                <button class="admin-primary-button" type="submit">Aplicar filtros</button>
+            </form>
+
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Reporte</th><th>Ciudadano</th><th>Operario / Empresa</th><th>Estado</th><th id="controlSeguimientosTh">Seguimientos</th><th>Fecha</th><th>Acción</th></tr></thead>
+                    <tbody id="controlReportesTabla"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<div class="modal" id="controlModal" role="dialog" aria-modal="true" aria-labelledby="controlModalTitle" aria-hidden="true" data-accion="cerrarModal" data-pasar="evento">
+    <div class="modal-card modal-card-wide" id="controlModalCard">
+        <div class="modal-header"><h3 id="controlModalTitle">Detalle del reporte</h3><button class="close" type="button" aria-label="Cerrar" data-accion="cerrarModal">×</button></div>
+        <div id="controlModalContent"></div>
+    </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="frontend/shared/perfil.js?v=20261120" defer></script>
+<script src="frontend/shared/notificaciones-ui.js?v=20261120" defer></script>
+<script src="frontend/pages/control/estado.js?v=20261120" defer></script>
+<script src="frontend/pages/control/navegacion.js?v=20261120" defer></script>
+<script src="frontend/pages/control/perfil.js?v=20261120" defer></script>
+<script src="frontend/pages/control/notificaciones.js?v=20261120" defer></script>
+<script src="frontend/pages/control/localidades.js?v=20261120" defer></script>
+<script src="frontend/pages/control/datos.js?v=20261120" defer></script>
+<script src="frontend/pages/control/render.js?v=20261120" defer></script>
+<script src="frontend/pages/control/detalle.js?v=20261120" defer></script>
+<script src="frontend/pages/control/seguimiento.js?v=20261120" defer></script>
+<script src="frontend/pages/control/exportar.js?v=20261120" defer></script>
+<script src="frontend/pages/control/realtime.js?v=20261120" defer></script>
+<script src="frontend/pages/control/init.js?v=20261120" defer></script>
+</body>
+</html>

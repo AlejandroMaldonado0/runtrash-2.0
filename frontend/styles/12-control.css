@@ -1,0 +1,72 @@
+/* =========================================================
+   RUNTRASH · PANEL DE ENTES DE CONTROL
+   Modulo: frontend/styles/12-control.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   Panel de entes de control (Distrito, Policía, SSPD)
+   ========================================================= */
+
+.role-badge.role-distrito { color: #1f5f8b; background: #e6f2fb; }
+.role-badge.role-policia { color: #1f4d2e; background: #e7f5ec; }
+.role-badge.role-sspd { color: #6a3d8f; background: #f2eafc; }
+
+.account-status.is-process { color: #8a5b0a; background: var(--warning-soft); }
+.account-status.is-pending { color: #9a5555; background: var(--danger-soft); }
+
+.modal-section-title {
+    margin: 22px 0 12px;
+    color: var(--brand-700);
+    font-size: 15px;
+}
+
+.control-history {
+    display: grid;
+    gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.control-history-item {
+    padding: 12px;
+    border: 1px solid #e3ebe6;
+    border-radius: 12px;
+    background: #f8fbf9;
+}
+
+.control-history-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.control-history-head span {
+    color: #66756d;
+}
+
+.control-history-item p {
+    margin: 8px 0;
+    color: #17241d;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.control-history-item small {
+    color: #8a978f;
+    font-size: 11px;
+}
+
+.report-detail-image {
+    margin: 14px 0;
+}
+
+.detail-thumb {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+}

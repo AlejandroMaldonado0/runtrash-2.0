@@ -1,0 +1,453 @@
+/* =========================================================
+   RUNTRASH · TARJETAS, ESTADISTICAS Y CONTENIDO
+   Modulo: frontend/styles/04-tarjetas.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   TARJETAS PRINCIPALES
+   ========================================================= */
+
+.report-card,
+.assignment-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+.report-card,
+.assignment-card,
+.company-card {
+    position: relative;
+    min-height: 184px;
+    margin-bottom: 22px;
+    padding: clamp(25px, 3vw, 34px);
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(216, 243, 106, 0.24), transparent 32%),
+        linear-gradient(120deg, var(--brand-900), var(--brand-700) 58%, var(--brand-600));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 25px;
+    box-shadow: 0 18px 42px rgba(8, 116, 67, 0.18);
+}
+
+.report-card::before,
+.assignment-card::before,
+.company-card::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 4px;
+    content: "";
+    background: linear-gradient(90deg, var(--lime), rgba(216, 243, 106, 0));
+}
+
+.report-card::after,
+.assignment-card::after,
+.company-card::after {
+    position: absolute;
+    z-index: 1;
+    content: "";
+    right: 3%;
+    bottom: -62px;
+    color: rgba(255, 255, 255, 0.09);
+    font-size: 170px;
+    line-height: 1;
+}
+
+.report-card::after { content: "♻"; }
+.assignment-card::after { content: "🚛"; }
+.company-card::after { content: "🏢"; }
+
+.report-content,
+.assignment-content,
+.company-card h2,
+.company-card p {
+    position: relative;
+    z-index: 2;
+}
+
+.report-content h2,
+.assignment-content h2,
+.company-card h2 {
+    max-width: 720px;
+    margin-bottom: 10px;
+    font-size: clamp(21px, 2.2vw, 28px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.report-content p,
+.assignment-content p,
+.company-card p {
+    max-width: 690px;
+    color: rgba(255, 255, 255, 0.74);
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.report-button,
+.route-button {
+    position: relative;
+    z-index: 3;
+    flex-shrink: 0;
+    padding: 13px 18px;
+    color: var(--brand-950);
+    background: var(--lime);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 13px;
+    box-shadow: 0 10px 24px rgba(2, 35, 19, 0.18);
+    font-size: 13px;
+    font-weight: 850;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.report-button:hover,
+.route-button:hover {
+    background: var(--lime-strong);
+    box-shadow: 0 14px 28px rgba(2, 35, 19, 0.25);
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   ESTADÍSTICAS Y CONTENIDO
+   ========================================================= */
+
+.dashboard-page .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.dashboard-page .stats:has(.stat-card:nth-child(4)) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-page .stat-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-width: 0;
+    padding: 18px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(224, 234, 228, 0.9);
+    border-radius: 18px;
+    box-shadow: var(--shadow-sm);
+    transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.dashboard-page .stat-card:hover {
+    border-color: #cfe0d5;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.dashboard-page .stat-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 22px;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    color: var(--brand-800);
+    background: var(--brand-100);
+    border-radius: 14px;
+}
+
+.dashboard-page .stat-card:nth-child(2) .stat-icon {
+    color: #a26408;
+    background: var(--warning-soft);
+}
+
+.dashboard-page .stat-card:nth-child(3) .stat-icon {
+    color: var(--info);
+    background: var(--info-soft);
+}
+
+.dashboard-page .stat-card:nth-child(4) .stat-icon {
+    color: #7153a3;
+    background: #f1ecff;
+}
+
+.dashboard-page .stat-info {
+    min-width: 0;
+}
+
+.dashboard-page .stat-info span {
+    display: block;
+    overflow: hidden;
+    margin-bottom: 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-page .stat-info strong {
+    color: var(--ink);
+    font-size: 25px;
+    font-weight: 850;
+    letter-spacing: -0.04em;
+}
+
+.dashboard-page .section {
+    padding: clamp(20px, 2.5vw, 28px);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(224, 234, 228, 0.9);
+    border-radius: 22px;
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-page .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 6px;
+}
+
+.dashboard-page .section-header h2 {
+    color: var(--ink);
+    font-size: 19px;
+    font-weight: 820;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-page .section-header a {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    padding: 7px 11px;
+    color: var(--brand-700);
+    background: var(--brand-50);
+    border: 1px solid var(--brand-100);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.dashboard-page .section-header a:hover {
+    color: var(--brand-900);
+    background: var(--brand-100);
+}
+
+.dashboard-page .section-subtitle {
+    margin-bottom: 14px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.dashboard-page .report-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 10px;
+    border-color: var(--line);
+    border-radius: 14px;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.dashboard-page .report-item + .report-item {
+    margin-top: 2px;
+}
+
+.dashboard-page .report-item:hover {
+    background: #fbfdfc;
+    transform: translateX(2px);
+}
+
+.dashboard-page .report-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    min-width: 0;
+}
+
+.dashboard-page .report-icon,
+.dashboard-page .report-thumb {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+    color: var(--brand-800);
+    background: var(--brand-50);
+    border: 1px solid var(--brand-100);
+    border-radius: 14px;
+}
+
+.dashboard-page .report-icon {
+    display: grid;
+    place-items: center;
+}
+
+.dashboard-page .report-thumb {
+    object-fit: cover;
+}
+
+.dashboard-page .report-info {
+    min-width: 0;
+}
+
+.dashboard-page .report-info strong,
+.dashboard-page .report-title {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.dashboard-page .report-location {
+    display: block;
+    margin-bottom: 3px;
+    color: #718078;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.dashboard-page .report-description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: #8a978f;
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.dashboard-page .status {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.01em;
+}
+
+.dashboard-page .pending {
+    color: var(--warning);
+    background: var(--warning-soft);
+    border-color: #f4e4b7;
+}
+
+.dashboard-page .progress {
+    color: var(--info);
+    background: var(--info-soft);
+    border-color: #d1e9fb;
+}
+
+.dashboard-page .done {
+    color: var(--brand-700);
+    background: var(--brand-50);
+    border-color: var(--brand-100);
+}
+
+.dashboard-page .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 11px;
+}
+
+.dashboard-page .action-button,
+.dashboard-page .small-button {
+    min-height: 34px;
+    border: 0;
+    cursor: pointer;
+    padding: 7px 11px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 800;
+    transition: transform var(--transition), filter var(--transition), box-shadow var(--transition);
+}
+
+.dashboard-page .action-button:hover,
+.dashboard-page .small-button:hover {
+    transform: translateY(-1px);
+}
+
+.dashboard-page .view-button,
+.dashboard-page .small-button {
+    color: var(--brand-700);
+    background: var(--brand-50);
+    border: 1px solid var(--brand-100);
+}
+
+.dashboard-page .process-button,
+.dashboard-page .done-button,
+.dashboard-page .primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--brand-700), var(--brand-600));
+}
+
+.dashboard-page .primary {
+    min-height: 45px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(10, 149, 82, 0.17);
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.dashboard-page .primary:hover {
+    box-shadow: 0 11px 24px rgba(10, 149, 82, 0.25);
+    transform: translateY(-1px);
+}
+
+.dashboard-page .assign-box {
+    gap: 9px;
+    margin: 15px 0 3px 87px;
+    padding: 12px;
+    background: #f7faf8;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+}
+
+.dashboard-page .assign-box select {
+    min-width: 0;
+    padding: 10px 12px;
+    color: var(--ink-soft);
+    background: #fff;
+    border: 1px solid #dce5df;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.dashboard-page .assign-box .primary {
+    min-height: 40px;
+}
+
+.dashboard-page .detail-row {
+    padding: 13px 2px;
+    border-color: var(--line);
+}
+
+.dashboard-page .detail-label {
+    color: #8b9890;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.11em;
+}
+
+.dashboard-page .detail-value {
+    color: var(--ink-soft);
+    font-size: 13px;
+}

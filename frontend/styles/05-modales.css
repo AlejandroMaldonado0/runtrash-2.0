@@ -1,0 +1,216 @@
+/* =========================================================
+   RUNTRASH · MODALES, FORMULARIOS Y AVISOS
+   Modulo: frontend/styles/05-modales.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   MODALES, CAMPOS Y NOTIFICACIONES
+   ========================================================= */
+
+.dashboard-page .modal {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    overflow-y: auto;
+    background: rgba(3, 28, 17, 0.62);
+    backdrop-filter: blur(7px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.dashboard-page .modal.show {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+.dashboard-page .modal-card {
+    width: 100%;
+    max-height: calc(100vh - 44px);
+    max-height: calc(100dvh - 44px);
+    padding: clamp(22px, 3vw, 30px);
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 23px;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.27);
+    transform: translateY(12px) scale(0.985);
+    transition: transform 220ms ease;
+}
+
+.dashboard-page .modal.show .modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.dashboard-page .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--line);
+}
+
+.dashboard-page .modal-header h3 {
+    color: var(--ink);
+    font-size: 19px;
+    font-weight: 820;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-page .close,
+.dashboard-page .close-modal {
+    display: grid;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    color: var(--muted);
+    background: #f1f5f2;
+    border: 0;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition), transform var(--transition);
+}
+
+.dashboard-page .close:hover,
+.dashboard-page .close-modal:hover {
+    color: var(--brand-800);
+    background: var(--brand-100);
+    transform: rotate(4deg);
+}
+
+.dashboard-page .input-group {
+    margin-bottom: 16px;
+}
+
+.dashboard-page .input-group label {
+    margin-bottom: 7px;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.dashboard-page .input-group input,
+.dashboard-page .input-group textarea,
+.dashboard-page .input-group select,
+.dashboard-page input[type="file"] {
+    width: 100%;
+    min-height: 45px;
+    padding: 11px 12px;
+    color: var(--ink);
+    background: #fbfdfc;
+    border: 1px solid #dce5df;
+    border-radius: 11px;
+    outline: none;
+    font-size: 13px;
+    transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.dashboard-page .input-group textarea {
+    min-height: 100px;
+    line-height: 1.55;
+    resize: vertical;
+}
+
+.dashboard-page .input-group input:focus,
+.dashboard-page .input-group textarea:focus,
+.dashboard-page .input-group select:focus,
+.dashboard-page input[type="file"]:focus {
+    background: #fff;
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 4px rgba(18, 184, 102, 0.09);
+}
+
+.dashboard-page .input-group select {
+    cursor: pointer;
+}
+
+.dashboard-page input[type="file"] {
+    padding: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.dashboard-page input[type="file"]::file-selector-button {
+    margin-right: 10px;
+    padding: 7px 10px;
+    color: var(--brand-800);
+    background: var(--brand-50);
+    border: 0;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.dashboard-page .gps-row {
+    display: flex;
+    gap: 9px;
+}
+
+.dashboard-page .gps-row input {
+    min-width: 0;
+    flex: 1;
+}
+
+.dashboard-page .small-button {
+    flex: 0 0 auto;
+}
+
+.dashboard-page .file-help {
+    margin-top: 6px;
+    color: #8b9890;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.dashboard-page .image-preview,
+.dashboard-page .detail-image {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow-sm);
+}
+
+.dashboard-page .image-preview {
+    display: none;
+    margin-top: 9px;
+}
+
+.dashboard-page .toast {
+    right: 28px;
+    bottom: 28px;
+    max-width: min(390px, calc(100vw - 32px));
+    padding: 14px 18px;
+    color: #fff;
+    background: var(--brand-950);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 13px;
+    box-shadow: 0 18px 50px rgba(3, 35, 20, 0.25);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.45;
+}
+
+#listaReportes > div:not(.report-item) {
+    min-height: 180px;
+    padding: 32px 20px !important;
+    color: var(--muted) !important;
+    background: #fbfdfc;
+    border: 1px dashed #d8e3dc;
+    border-radius: 15px;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+}

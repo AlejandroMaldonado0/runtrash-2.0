@@ -1,15 +1,30 @@
+/**
+ * @file Utilidades compartidas del frontend.
+ *
+ * Expone `window.RunTrashFeatures` con helpers puros y sin
+ * dependencias: escape de HTML/CSV, descarga de archivos, formato de
+ * fechas y agrupaciones usadas por los paneles.
+ *
+ * @module features
+ */
 (() => {
     "use strict";
 
     const RunTrashFeatures = {
         localidades: [
-            "Usaquén", "Suba", "Kennedy", "Engativá", "Fontibón",
-            "Los Alpes", "Chapinero", "Teusaquillo", "La Candelaria",
-            "San Cristóbal", "Santa Fe", "San Andrés", "Sumapaz",
-            "Usura", "Rafael Uribe", "Tunjuel", "Bosa",
-            "Ciudad Bolívar", "Puente Aranda"
+            "Usaquén", "Chapinero", "Santa Fe", "San Cristóbal", "Usme",
+            "Tunjuelito", "Bosa", "Kennedy", "Fontibón", "Engativá",
+            "Suba", "Barrios Unidos", "Teusaquillo", "Los Mártires",
+            "Antonio Nariño", "Puente Aranda", "La Candelaria",
+            "Rafael Uribe Uribe", "Ciudad Bolívar", "Sumapaz"
         ],
 
+        /**
+         * Escapa texto para insertarlo en HTML.
+         *
+         * @param {*} value - Valor a escapar.
+         * @returns {string} Texto seguro para HTML.
+         */
         escapeHTML(value) {
             return String(value ?? "")
                 .replaceAll("&", "&amp;")
@@ -19,6 +34,12 @@
                 .replaceAll("'", "&#039;");
         },
 
+        /**
+         * Escapa una celda CSV y neutraliza fórmulas de hoja de cálculo.
+         *
+         * @param {*} value - Valor de la celda.
+         * @returns {string} Celda entre comillas.
+         */
         escapeCSV(value) {
             let text = String(value ?? "");
 
@@ -29,6 +50,75 @@
             return `"${text.replaceAll('"', '""')}"`;
         },
 
+        /**
+         * Traduce el estado interno a texto legible.
+         *
+         * @param {string} estado - `pendiente`, `en proceso` o `completado`.
+         * @returns {string} Etiqueta para la interfaz.
+         */
+        textoEstado(estado) {
+            return estado === "pendiente"
+                ? "Pendiente"
+                : estado === "en proceso"
+                    ? "En proceso"
+                    : "Completado";
+        },
+
+        /**
+         * Devuelve la clase CSS asociada a un estado.
+         *
+         * @param {string} estado - Estado del reporte.
+         * @returns {'pending'|'progress'|'done'} Clase visual.
+         */
+        claseEstado(estado) {
+            return estado === "pendiente"
+                ? "pending"
+                : estado === "en proceso"
+                    ? "progress"
+                    : "done";
+        },
+
+        /**
+         * Formatea una fecha en español de Colombia.
+         *
+         * @param {string|Date} fecha - Fecha a mostrar.
+         * @returns {string} Fecha corta o cadena vacía.
+         */
+        fechaBonita(fecha) {
+            return fecha
+                ? new Date(fecha).toLocaleString("es-CO", {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                })
+                : "";
+        },
+
+        /**
+         * Copia un reporte escapando los campos que se pintan como HTML.
+         *
+         * @param {object} reporte - Reporte original.
+         * @returns {object} Copia con texto escapado.
+         */
+        reporteSeguro(reporte) {
+            return {
+                ...reporte,
+                tipo: this.escapeHTML(reporte.tipo),
+                ubicacion: this.escapeHTML(reporte.ubicacion),
+                localidad: this.escapeHTML(reporte.localidad || "Sin localidad"),
+                descripcion: this.escapeHTML(reporte.descripcion),
+                ciudadano: this.escapeHTML(reporte.ciudadano || "Sin información"),
+                operario: this.escapeHTML(reporte.operario || "Sin asignar")
+            };
+        },
+
+        /**
+         * Genera y descarga un archivo CSV compatible con Excel.
+         *
+         * @param {string} filename - Nombre del archivo.
+         * @param {string[]} headers - Encabezados.
+         * @param {Array<Array<*>>} rows - Filas de datos.
+         * @returns {void}
+         */
         downloadCSV(filename, headers, rows) {
             const headerLine = headers.map(this.escapeCSV).join(",");
             const body = rows
@@ -49,6 +139,13 @@
             window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         },
 
+        /**
+         * Abre una ventana con el reporte formateado y lanza la impresión.
+         *
+         * @param {{title: string, subtitle?: string, headers?: string[], rows?: Array<Array<*>>, summary?: Array<{label: string, value: *}>}} opciones - Contenido del reporte.
+         * @returns {void}
+         * @throws {Error} Si el navegador bloquea la ventana emergente.
+         */
         printPDF({ title, subtitle = "", headers = [], rows = [], summary = [] }) {
             const printWindow = window.open("", "_blank", "width=1050,height=780");
 
@@ -95,8 +192,21 @@
             printWindow.document.close();
         },
 
+        /**
+         * Calcula la distancia en kilómetros entre dos coordenadas.
+         *
+         * @param {{latitud: *, longitud: *}} a - Punto de origen.
+         * @param {{latitud: *, longitud: *}} b - Punto de destino.
+         * @returns {number} Distancia en km.
+         */
         haversine(a, b) {
             const earthRadius = 6371;
+            /**
+             * Convierte grados sexagesimales a radianes.
+             *
+             * @param {number} degrees - Ángulo en grados.
+             * @returns {number} Ángulo en radianes.
+             */
             const toRadians = (degrees) => degrees * Math.PI / 180;
             const lat1 = toRadians(Number(a.latitud));
             const lon1 = toRadians(Number(a.longitud));
@@ -110,6 +220,13 @@
             return earthRadius * 2 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
         },
 
+        /**
+         * Ordena reportes con un vecino más cercano para armar una ruta corta.
+         *
+         * @param {Array<object>} reports - Reportes con coordenadas.
+         * @param {number} [limit=15] - Máximo de paradas.
+         * @returns {Array<object>} Reportes ordenados.
+         */
         optimizeRoute(reports, limit = 15) {
             const validReports = reports
                 .filter((report) => report.latitud !== null && report.latitud !== "" && report.longitud !== null && report.longitud !== "")
@@ -139,6 +256,12 @@
             return ordered;
         },
 
+        /**
+         * Suma la distancia entre paradas consecutivas.
+         *
+         * @param {Array<object>} reports - Ruta ordenada.
+         * @returns {number} Distancia total en km.
+         */
         routeDistance(reports) {
             if (reports.length < 2) return 0;
             return reports.slice(1).reduce(
@@ -147,6 +270,12 @@
             );
         },
 
+        /**
+         * Construye una URL de indicaciones de Google Maps.
+         *
+         * @param {Array<object>} reports - Paradas de la ruta.
+         * @returns {string} URL de Google Maps.
+         */
         buildDirectionsURL(reports) {
             if (!reports.length) return "https://www.google.com/maps";
 
@@ -166,6 +295,12 @@
                 + "&travelmode=driving";
         },
 
+        /**
+         * Construye una URL para ver los reportes en Google Maps.
+         *
+         * @param {Array<object>} reports - Reportes con coordenadas.
+         * @returns {string} URL de Google Maps.
+         */
         buildMapURL(reports) {
             if (!reports.length) return "https://www.google.com/maps";
 
@@ -179,11 +314,23 @@
                 + `&zoom=13`;
         },
 
+        /**
+         * Construye una URL de navegación de Waze para un reporte.
+         *
+         * @param {object} report - Reporte con coordenadas.
+         * @returns {string} URL de Waze o cadena vacía.
+         */
         buildWazeURL(report) {
             if (!report?.latitud || !report?.longitud) return "";
             return `https://waze.com/ul?ll=${encodeURIComponent(`${report.latitud},${report.longitud}`)}&navigate=yes&zoom=17`;
         },
 
+        /**
+         * Construye la URL del mapa embebido del primer reporte.
+         *
+         * @param {Array<object>} reports - Reportes con coordenadas.
+         * @returns {string} URL para iframe.
+         */
         mapEmbedURL(reports) {
             if (!reports.length) return "";
 
@@ -205,13 +352,33 @@
                 return `<div class="${clase} report-thumb-vacio" aria-hidden="true">${icono}</div>`;
             }
 
-            const url = this.escapeHTML(apiBase + reporte.imagen_url);
+            /*
+            El endpoint de imagenes exige sesion. Un <img> no puede
+            enviar la cabecera Authorization, asi que el token viaja
+            como parametro de consulta; el backend lo acepta igual.
+            */
+            const token = window.RunTrashAPI
+                ? window.RunTrashAPI.token()
+                : "";
+            const separador = reporte.imagen_url.includes("?") ? "&" : "?";
+            const url = this.escapeHTML(
+                apiBase
+                + reporte.imagen_url
+                + (token ? `${separador}token=${encodeURIComponent(token)}` : "")
+            );
 
             return `<img class="${clase}" src="${url}" alt="Foto del reporte"
                         loading="lazy"
-                        onerror="this.outerHTML='<div class=&quot;${clase} report-thumb-vacio&quot; aria-hidden=&quot;true&quot;>${icono}</div>'">`;
+                        data-accion="imagenNoDisponible" data-pasar="elemento"
+                        data-clase="${this.escapeHTML(clase)}" data-icono="${this.escapeHTML(icono)}">`;
         },
 
+        /**
+         * Determina el sector de un reporte a partir de sus campos.
+         *
+         * @param {object} report - Reporte.
+         * @returns {string} Localidad, sector o texto de respaldo.
+         */
         sectorFor(report) {
             const explicitSector = report.localidad || report.sector || report.zona_asignada;
             if (explicitSector) return String(explicitSector).trim();
@@ -223,6 +390,13 @@
             return location.split(/\s*[,\-–]\s*/)[0] || "Sin sector";
         },
 
+        /**
+         * Agrupa reportes recientes por sector y calcula porcentajes.
+         *
+         * @param {Array<object>} reports - Reportes a agrupar.
+         * @param {number} [days=15] - Ventana de tiempo en días.
+         * @returns {Array<object>} Sectores ordenados por total.
+         */
         reportsBySector(reports, days = 15) {
             const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
             const grouped = new Map();
@@ -254,6 +428,12 @@
             return result.map((item) => ({ ...item, percentage: Math.round(item.total / maximum * 100) }));
         },
 
+        /**
+         * Convierte una fecha en texto relativo (`hace 3 horas`).
+         *
+         * @param {string|Date} dateValue - Fecha a convertir.
+         * @returns {string} Texto relativo o cadena vacía.
+         */
         relativeTime(dateValue) {
             if (!dateValue) return "";
             const seconds = Math.round((new Date(dateValue).getTime() - Date.now()) / 1000);
@@ -279,6 +459,14 @@
             return "";
         },
 
+        /**
+         * Ejecuta `fetch` agregando el token y cerrando la sesión si expira.
+         *
+         * @param {string} input - URL de la API.
+         * @param {RequestInit} [options={}] - Opciones de fetch.
+         * @returns {Promise<Response>} Respuesta HTTP.
+         * @throws {Error} Si la sesión expiró (401).
+         */
         async apiFetch(input, options = {}) {
             const headers = new Headers(options.headers || {});
             const token = localStorage.getItem("runtrash_token");
@@ -298,6 +486,14 @@
             return response;
         },
 
+        /**
+         * Abre el canal SSE de eventos y devuelve la función para cerrarlo.
+         *
+         * @param {string} apiBase - Base de la API.
+         * @param {(evento: object) => void} [onEvent] - Callback por evento.
+         * @param {(estado: string) => void} [onStatus] - Callback de conexión.
+         * @returns {() => void} Función para cerrar el canal.
+         */
         connectEvents(apiBase, onEvent, onStatus) {
             if (!("EventSource" in window)) return () => {};
 
@@ -318,6 +514,12 @@
             return () => source.close();
         },
 
+        /**
+         * Solicita permiso para mostrar notificaciones del navegador.
+         *
+         * @returns {Promise<string>} Permiso concedido.
+         * @throws {Error} Si no hay soporte o el usuario lo niega.
+         */
         async requestNotificationPermission() {
             if (!("Notification" in window)) {
                 throw new Error("Este navegador no admite notificaciones.");
@@ -333,6 +535,13 @@
             return permission;
         },
 
+        /**
+         * Muestra una notificación nativa si hay permiso.
+         *
+         * @param {string} title - Título.
+         * @param {string} message - Cuerpo del mensaje.
+         * @returns {void}
+         */
         notify(title, message) {
             if ("Notification" in window && Notification.permission === "granted") {
                 const notificacion = new Notification(title, {
@@ -348,6 +557,11 @@
             }
         },
 
+        /**
+         * Consulta el estado del permiso de notificaciones.
+         *
+         * @returns {'granted'|'denied'|'default'|'no-soportado'} Estado.
+         */
         permissionState() {
             if (!("Notification" in window)) return "no-soportado";
             return Notification.permission;
@@ -373,6 +587,13 @@
             };
         },
 
+        /**
+         * Marca todas las notificaciones como leídas.
+         *
+         * @param {string} apiBase - Base de la API.
+         * @returns {Promise<boolean>} `true` si se actualizaron.
+         * @throws {Error} Si la petición falla.
+         */
         async marcarNotificacionesLeidas(apiBase) {
             const response = await this.apiFetch(`${apiBase}/api/notificaciones/leidas`, {
                 method: "POST"
@@ -386,6 +607,12 @@
             return true;
         },
 
+        /**
+         * Devuelve el icono y la clase visual de un tipo de notificación.
+         *
+         * @param {string} tipo - Tipo de notificación.
+         * @returns {{clase: string, simbolo: string}} Icono.
+         */
         iconoNotificacion(tipo) {
             const iconos = {
                 reporte_nuevo: { clase: "pending", simbolo: "!" },
@@ -398,6 +625,14 @@
             return iconos[tipo] || { clase: "info", simbolo: "🔔" };
         },
 
+        /**
+         * Pinta la lista de notificaciones y enlaza clics/teclado.
+         *
+         * @param {HTMLElement|null} contenedor - Destino del HTML.
+         * @param {Array<object>} notificaciones - Notificaciones a pintar.
+         * @param {{alHacerClic?: (tipo: string, id: number, elemento: HTMLElement) => void}} [opciones] - Callback de apertura.
+         * @returns {void}
+         */
         renderNotificaciones(contenedor, notificaciones, { alHacerClic } = {}) {
             if (!contenedor) return;
 
@@ -434,6 +669,12 @@
 
             if (!alHacerClic) return;
 
+            /**
+             * Extrae el tipo y el id de la notificación y avisa al panel.
+             *
+             * @param {HTMLElement} elemento - Elemento de la notificación.
+             * @returns {void}
+             */
             const abrir = (elemento) => {
                 const tipo = elemento.dataset.notificacionTipo;
                 const id = elemento.dataset.notificacionId;
@@ -451,6 +692,11 @@
             });
         },
 
+        /**
+         * Describe el estado de las alertas para el botón del modal.
+         *
+         * @returns {{texto: string, activo: boolean, bloqueado?: boolean}} Estado visual.
+         */
         textoBotonAlertas() {
             const estado = this.permissionState();
 
@@ -462,4 +708,13 @@
     };
 
     window.RunTrashFeatures = RunTrashFeatures;
+
+    /*
+    Alias globales para conservar las llamadas existentes de las páginas
+    (`textoEstado(...)`, `fechaBonita(...)`, etc.) sin duplicar código.
+    */
+    window.textoEstado = (estado) => RunTrashFeatures.textoEstado(estado);
+    window.claseEstado = (estado) => RunTrashFeatures.claseEstado(estado);
+    window.fechaBonita = (fecha) => RunTrashFeatures.fechaBonita(fecha);
+    window.reporteSeguro = (reporte) => RunTrashFeatures.reporteSeguro(reporte);
 })();

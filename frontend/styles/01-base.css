@@ -1,0 +1,135 @@
+/* =========================================================
+   RUNTRASH · BASE Y SISTEMA VISUAL COMPARTIDO
+   Modulo: frontend/styles/01-base.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   RUNTRASH · SISTEMA VISUAL COMPARTIDO
+   ========================================================= */
+
+:root {
+    color-scheme: light;
+    --brand-950: #052d19;
+    --brand-900: #073c23;
+    --brand-800: #07542f;
+    --brand-700: #087443;
+    --brand-600: #0a9552;
+    --brand-500: #12b866;
+    --brand-400: #45d383;
+    --brand-300: #8be8ad;
+    --brand-100: #dcf8e6;
+    --brand-50: #f0fcf4;
+    --lime: #d8f36a;
+    --lime-strong: #c8eb43;
+    --ink: #14211a;
+    --ink-soft: #3f5047;
+    --muted: #718078;
+    --line: #e3ebe6;
+    --surface: #ffffff;
+    --canvas: #f4f7f5;
+    --danger: #c93b3b;
+    --danger-soft: #fff0f0;
+    --warning: #a96508;
+    --warning-soft: #fff7df;
+    --info: #176ca8;
+    --info-soft: #eaf5ff;
+    --shadow-sm: 0 8px 24px rgba(18, 55, 35, 0.06);
+    --shadow-md: 0 18px 50px rgba(18, 55, 35, 0.1);
+    --shadow-lg: 0 30px 80px rgba(3, 35, 20, 0.18);
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 26px;
+    --transition: 180ms ease;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+    margin: 0;
+}
+
+html {
+    min-width: 320px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Segoe UI Variable", "Segoe UI", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+img,
+svg {
+    display: block;
+}
+
+::selection {
+    color: var(--brand-950);
+    background: var(--lime);
+}
+
+:focus-visible {
+    outline: 3px solid rgba(18, 184, 102, 0.3);
+    outline-offset: 3px;
+}
+
+.skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 3000;
+    padding: 10px 15px;
+    color: #fff;
+    background: var(--brand-900);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transform: translateY(-150%);
+    transition: transform var(--transition);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}

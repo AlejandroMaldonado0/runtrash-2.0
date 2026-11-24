@@ -1,0 +1,525 @@
+/* =========================================================
+   RUNTRASH · RECUPERACION, FOTOS Y NOTIFICACIONES
+   Modulo: frontend/styles/11-notificaciones.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+/* =========================================================
+   RUNTRASH · RECUPERACIÓN DE CONTRASEÑA Y NOTIFICACIONES
+   ========================================================= */
+
+/* --- Selector de estado del operario --- */
+.estado-actual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 14px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.estado-actual .status {
+    font-size: 11px;
+}
+
+.estado-opciones {
+    display: grid;
+    gap: 10px;
+    margin: 4px 0 14px;
+}
+
+.estado-opcion {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    padding: 13px 15px;
+    text-align: left;
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.estado-opcion:hover {
+    border-color: var(--brand-300);
+    transform: translateY(-1px);
+}
+
+.estado-opcion:focus-visible {
+    outline: 3px solid rgba(32, 200, 117, 0.35);
+    outline-offset: 2px;
+}
+
+.estado-opcion-icon {
+    display: grid;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: var(--muted);
+    background: #f2f7f4;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 850;
+    transition: color var(--transition), background var(--transition);
+}
+
+.estado-opcion-texto {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.estado-opcion-texto strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 850;
+}
+
+.estado-opcion-texto small {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.estado-opcion-tag {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 4px 9px;
+    color: var(--muted);
+    background: #eef4f1;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* En proceso */
+.estado-opcion.progress.is-selected {
+    background: linear-gradient(135deg, #eef5ff, #f7fbff);
+    border-color: #3f86d4;
+    box-shadow: 0 8px 20px rgba(25, 116, 180, 0.16);
+}
+
+.estado-opcion.progress.is-selected .estado-opcion-icon {
+    color: #fff;
+    background: linear-gradient(135deg, #2f7fd0, #1b6fb8);
+}
+
+.estado-opcion.progress.is-selected .estado-opcion-tag {
+    color: #14568f;
+    background: #dbeaf9;
+}
+
+/* Completado */
+.estado-opcion.done.is-selected {
+    background: linear-gradient(135deg, #effaf3, #f8fdfa);
+    border-color: var(--brand-500);
+    box-shadow: 0 8px 20px rgba(11, 155, 84, 0.16);
+}
+
+.estado-opcion.done.is-selected .estado-opcion-icon {
+    color: #14391f;
+    background: linear-gradient(135deg, var(--lime), var(--lime-strong));
+}
+
+.estado-opcion.done.is-selected .estado-opcion-tag {
+    color: var(--brand-800);
+    background: var(--brand-100);
+}
+
+#confirmStateButton.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Boton compacto de la tarjeta */
+.state-button {
+    color: var(--ink-soft);
+    background: #fff;
+    border: 1px dashed var(--line);
+}
+
+.state-button:hover {
+    color: var(--brand-800);
+    background: var(--brand-50);
+    border-color: var(--brand-300);
+    border-style: solid;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+
+    .estado-opcion {
+        min-height: 68px;
+        padding: 15px 16px;
+    }
+
+    .estado-opcion-tag {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .estado-opcion-texto small {
+        font-size: 10.5px;
+    }
+
+    .estado-opcion-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+    }
+}
+
+/* =========================================================
+   RUNTRASH · FOTOS NO DISPONIBLES
+   Reemplaza el icono de "imagen rota" cuando el archivo ya no
+   existe (reportes antiguos creados antes de usar Neon Storage).
+   ========================================================= */
+.report-thumb-vacio {
+    display: grid;
+    place-items: center;
+    flex: 0 0 54px;
+    width: 54px;
+    height: 54px;
+    color: var(--muted);
+    background: #eef4f1;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-size: 22px;
+}
+
+.detail-image.report-thumb-vacio {
+    width: 100%;
+    height: 190px;
+    font-size: 46px;
+    border-radius: 14px;
+}
+
+/* --- Asistente de recuperacion --- */
+.recuperacion-box {
+    max-width: 520px;
+}
+
+.pasos-recuperacion {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.pasos-recuperacion li {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.pasos-recuperacion li span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    color: var(--muted);
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 850;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+
+.pasos-recuperacion li.is-activo {
+    color: var(--brand-800);
+}
+
+.pasos-recuperacion li.is-activo span {
+    color: #14391f;
+    background: linear-gradient(135deg, var(--lime), var(--lime-strong));
+    border-color: transparent;
+    box-shadow: 0 6px 14px rgba(154, 206, 63, 0.32);
+}
+
+.pasos-recuperacion li.is-hecho span {
+    color: #fff;
+    background: var(--brand-600);
+    border-color: transparent;
+}
+
+.recuperacion-paso {
+    display: grid;
+    gap: 14px;
+}
+
+.recuperacion-paso[hidden] {
+    display: none;
+}
+
+.recuperacion-error {
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    color: #9a3412;
+    background: #fff4ed;
+    border: 1px solid #fed7aa;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.recuperacion-error[hidden] {
+    display: none;
+}
+
+.codigo-enviado {
+    padding: 14px 16px;
+    background: linear-gradient(135deg, var(--brand-50), #f4fdf7);
+    border: 1px dashed var(--brand-300);
+    border-radius: 14px;
+    text-align: center;
+}
+
+.codigo-enviado[hidden] {
+    display: none;
+}
+
+.codigo-enviado:not([hidden]) {
+    display: block;
+}
+
+.codigo-enviado strong {
+    display: block;
+    color: var(--brand-800);
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.codigo-enviado p {
+    margin: 5px 0 9px;
+    color: var(--ink-soft);
+    font-size: 12px;
+}
+
+.codigo-enviado code {
+    display: inline-block;
+    padding: 7px 16px;
+    color: #14391f;
+    background: linear-gradient(135deg, var(--lime), var(--lime-strong));
+    border-radius: 10px;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 22px;
+    font-weight: 850;
+    letter-spacing: 0.28em;
+}
+
+#codigoRecuperacion {
+    text-align: center;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.32em;
+}
+
+.recuperacion-exito {
+    display: grid;
+    justify-items: center;
+    gap: 9px;
+    padding: 8px 0 2px;
+    text-align: center;
+}
+
+.recuperacion-exito[hidden] {
+    display: none;
+}
+
+.recuperacion-exito span {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    background: linear-gradient(135deg, var(--lime), var(--lime-strong));
+    border-radius: 50%;
+    font-size: 24px;
+    box-shadow: 0 12px 26px rgba(154, 206, 63, 0.34);
+}
+
+.recuperacion-exito strong {
+    color: var(--brand-900);
+    font-size: 18px;
+    font-weight: 850;
+}
+
+.recuperacion-exito p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.recuperacion-exito .main-button {
+    margin-top: 6px;
+    min-width: 220px;
+}
+
+.recuperacion-box .main-button,
+.recuperacion-box .modal-actions .primary,
+.recuperacion-box .modal-actions .secondary {
+    width: 100%;
+}
+
+.recuperacion-box .split-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* --- Notificaciones --- */
+.notification-item {
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+}
+
+/* Los no leidos se distinguen con una barra lateral, no con un verde plano */
+.notification-item.is-unread {
+    background: #fff;
+    border-color: var(--brand-100);
+    box-shadow: inset 3px 0 0 var(--brand-500);
+}
+
+.notification-item.is-read {
+    opacity: 0.66;
+}
+
+.notification-item .notification-item-icon.info {
+    background: #e8f2fd;
+    color: #1b6fb8;
+}
+
+.notification-item .notification-item-icon.alert {
+    background: #ffe9e9;
+    color: #c62828;
+}
+
+.notification-item .notification-item-icon.done {
+    background: #e4f8ea;
+    color: #1a7f47;
+}
+
+.notification-item .notification-item-icon.progress {
+    background: #e7f0ff;
+    color: #2a63c9;
+}
+
+.notification-item .notification-item-icon.pending {
+    background: #fff2d9;
+    color: #b97809;
+}
+
+.notification-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+}
+
+.notification-toolbar p {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.notification-toolbar .secondary {
+    width: auto;
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 38px;
+    padding: 8px 14px;
+    font-size: 11px;
+}
+
+.alerta-estado {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+    padding: 11px 13px;
+    color: #7a4c07;
+    background: linear-gradient(135deg, #fff8e6, #fffdf5);
+    border: 1px solid #fbe3ab;
+    border-radius: 13px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.alerta-estado.is-activa {
+    color: #14663c;
+    background: linear-gradient(135deg, var(--brand-50), #f6fdf9);
+    border-color: var(--brand-300);
+}
+
+.alerta-estado[hidden] {
+    display: none;
+}
+
+.alerta-estado button {
+    margin-left: auto;
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 7px 13px;
+    color: #fff;
+    background: linear-gradient(135deg, #b97809, #a1650a);
+    border: 0;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.alerta-estado.is-activa button {
+    background: linear-gradient(135deg, var(--brand-600), var(--brand-700));
+}
+
+.alerta-estado button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+@media (max-width: 480px) {
+
+    .pasos-recuperacion li {
+        font-size: 9px;
+    }
+
+    .pasos-recuperacion li span {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+    }
+
+    .codigo-enviado code {
+        font-size: 19px;
+        letter-spacing: 0.22em;
+    }
+
+    .recuperacion-box .split-actions {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,683 @@
+/* =========================================================
+   RUNTRASH · ESTILOS BASE DEL INICIO (LEGADO)
+   Modulo: frontend/styles/00-inicio.css
+   Extraido del bloque <style> de index.html para separar
+   estructura y presentacion. Se importa primero en styles.css
+   para conservar la cascada original (antes del resto de capas).
+   ========================================================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    min-height:100vh;
+
+    background:
+        linear-gradient(
+            135deg,
+            #b09c58,
+            #d5902f
+        );
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:20px;
+}
+
+
+/* =========================
+   CONTENEDOR
+========================= */
+
+.container{
+    width:100%;
+    max-width:1050px;
+    min-height:620px;
+
+    background:white;
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    display:grid;
+
+    grid-template-columns:42% 58%;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.20);
+}
+
+
+/* =========================
+   PANEL IZQUIERDO
+========================= */
+
+.left{
+
+    background:
+        linear-gradient(
+            160deg,
+            #2e7d32,
+            #43a047
+        );
+
+    color:white;
+
+    padding:40px;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+}
+
+.logo{
+
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    margin-bottom:20px;
+}
+
+.logo img{
+
+    width:400px;
+    max-width:100%;
+    height:auto;
+
+    display:block;
+}
+
+.left h2{
+
+    font-size:28px;
+
+    margin-bottom:12px;
+}
+
+.left p{
+
+    font-size:15px;
+
+    line-height:1.6;
+
+    opacity:.9;
+
+    max-width:350px;
+}
+
+
+/* =========================
+   PANEL DERECHO
+========================= */
+
+.right{
+
+    position:relative;
+
+    padding:45px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+
+/* =========================
+   IMAGEN DECORATIVA
+========================= */
+
+.logo2{
+
+    position:absolute;
+
+    top:150px;
+    left:0;
+
+    width:100%;
+    height:550px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:0;
+
+    pointer-events:none;
+
+    overflow:visible;
+}
+
+.logo2 img{
+
+    width:600px;
+
+    max-width:none;
+
+    height:auto;
+
+    display:block;
+
+    opacity:.30;
+}
+
+
+/* =========================
+   CONTENIDO SOBRE IMAGEN
+========================= */
+
+.right > *:not(.logo2){
+
+    position:relative;
+
+    z-index:2;
+}
+
+
+/* =========================
+   TITULO
+========================= */
+
+.form-title{
+
+    text-align:center;
+
+    margin-bottom:25px;
+}
+
+.form-title h1{
+
+    color:#2e7d32;
+
+    font-size:30px;
+
+    margin-bottom:7px;
+}
+
+.form-title p{
+
+    color:#777;
+
+    font-size:14px;
+}
+
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-group{
+
+    margin-bottom:17px;
+}
+
+.input-group label{
+
+    display:block;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    color:#444;
+
+    margin-bottom:7px;
+}
+
+.input-group input{
+
+    width:100%;
+
+    padding:13px 15px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    outline:none;
+
+    font-size:14px;
+
+    background:rgba(255,255,255,.92);
+
+    transition:.2s;
+}
+
+.input-group input:focus{
+
+    border-color:#2e7d32;
+
+    box-shadow:
+        0 0 0 3px rgba(46,125,50,.10);
+}
+
+
+/* =========================
+   TIPO DE USUARIO
+========================= */
+
+.tipo-label{
+
+    margin-bottom:9px !important;
+}
+
+.tipo-usuario{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:8px;
+}
+
+.tipo-btn{
+
+    border:1px solid #ddd;
+
+    background:white;
+
+    color:#555;
+
+    padding:11px 5px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    transition:.2s;
+}
+
+.tipo-btn:hover{
+
+    border-color:#2e7d32;
+
+    color:#2e7d32;
+}
+
+.tipo-btn.active{
+
+    background:#2e7d32;
+
+    color:white;
+
+    border-color:#2e7d32;
+
+    box-shadow:
+        0 4px 10px rgba(46,125,50,.20);
+}
+
+
+/* =========================
+   CAMPOS ESPECIALES
+========================= */
+
+.campo-extra{
+
+    display:none;
+}
+
+.campo-extra.visible{
+
+    display:block;
+}
+
+
+/* =========================
+   OLVIDASTE CONTRASEÑA
+========================= */
+
+.forgot{
+
+    text-align:right;
+
+    margin-top:7px;
+}
+
+.forgot a{
+
+    color:#2e7d32;
+
+    text-decoration:none;
+
+    font-size:12px;
+
+    font-weight:bold;
+}
+
+
+/* =========================
+   BOTON PRINCIPAL
+========================= */
+
+.main-button{
+
+    width:100%;
+
+    border:none;
+
+    background:#2e7d32;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:11px;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    margin-top:5px;
+}
+
+.main-button:hover{
+
+    background:#256628;
+
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 6px 15px rgba(46,125,50,.20);
+}
+
+
+/* =========================
+   REGISTRO
+========================= */
+
+.register-text{
+
+    text-align:center;
+
+    margin-top:20px;
+
+    color:#777;
+
+    font-size:13px;
+}
+
+.register-text a{
+
+    color:#2e7d32;
+
+    font-weight:bold;
+
+    text-decoration:none;
+
+    cursor:pointer;
+}
+
+
+/* =========================
+   MODAL REGISTRO
+========================= */
+
+.modal{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+        rgba(0,0,0,.55);
+
+    z-index:100;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:20px;
+}
+
+.modal.active{
+
+    display:flex;
+}
+
+.modal-box{
+
+    width:100%;
+
+    max-width:550px;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    background:white;
+
+    border-radius:22px;
+
+    padding:30px;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.30);
+
+    position:relative;
+}
+
+
+/* =========================
+   CERRAR
+========================= */
+
+.close{
+
+    position:absolute;
+
+    top:15px;
+    right:18px;
+
+    width:35px;
+    height:35px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:#f1f1f1;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+    color:#555;
+}
+
+.close:hover{
+
+    background:#e5e5e5;
+}
+
+
+/* =========================
+   TITULO REGISTRO
+========================= */
+
+.register-title{
+
+    text-align:center;
+
+    margin-bottom:22px;
+}
+
+.register-title h2{
+
+    color:#2e7d32;
+
+    font-size:25px;
+
+    margin-bottom:5px;
+}
+
+.register-title p{
+
+    color:#777;
+
+    font-size:13px;
+}
+
+
+/* =========================
+   GRID FORMULARIO
+========================= */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:0 15px;
+}
+
+.full{
+
+    grid-column:
+        1 / -1;
+}
+
+
+/* =========================
+   MENSAJES
+========================= */
+
+.mensaje{
+
+    display:none;
+
+    padding:11px;
+
+    border-radius:9px;
+
+    margin-bottom:15px;
+
+    font-size:13px;
+
+    text-align:center;
+}
+
+.mensaje.error{
+
+    display:block;
+
+    background:#ffebee;
+
+    color:#c62828;
+}
+
+.mensaje.exito{
+
+    display:block;
+
+    background:#e8f5e9;
+
+    color:#2e7d32;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:850px){
+
+    .container{
+
+        grid-template-columns:1fr;
+
+        max-width:550px;
+    }
+
+    .left{
+
+        padding:25px;
+
+        min-height:260px;
+    }
+
+    .left p{
+
+        display:none;
+    }
+
+    .logo img{
+
+        width:300px;
+    }
+
+    .right{
+
+        padding:30px;
+    }
+
+}
+
+@media(max-width:550px){
+
+    body{
+
+        padding:10px;
+    }
+
+    .container{
+
+        border-radius:18px;
+    }
+
+    .right{
+
+        padding:25px 20px;
+    }
+
+    .form-grid{
+
+        grid-template-columns:1fr;
+    }
+
+    .full{
+
+        grid-column:auto;
+    }
+
+    .tipo-usuario{
+
+        grid-template-columns:1fr;
+    }
+
+    .modal-box{
+
+        padding:25px 20px;
+    }
+
+}

@@ -1,8 +1,23 @@
+/**
+ * @file Comportamiento de interfaz compartido.
+ *
+ * Controla el sidebar responsive, el foco y cierre de modales, las
+ * etiquetas de fecha y el feedback del formulario de login. Se carga
+ * en todas las páginas y no depende de jQuery ni frameworks.
+ *
+ * @module ui
+ */
 (() => {
     "use strict";
 
     const DESKTOP_BREAKPOINT = 820;
 
+    /**
+     * Abre o cierra el sidebar y sincroniza backdrop y `aria-expanded`.
+     *
+     * @param {boolean} open - `true` para abrir.
+     * @returns {void}
+     */
     function setSidebar(open) {
         const sidebar = document.querySelector("[data-sidebar]");
         const backdrop = document.querySelector("[data-sidebar-backdrop]");
@@ -22,6 +37,11 @@
         }
     }
 
+    /**
+     * Cierra el modal visible simulando el clic de su botón de cierre.
+     *
+     * @returns {boolean} `true` si había un modal abierto.
+     */
     function closeVisibleModal() {
         const modal = document.querySelector(".modal.show, .modal.active");
         if (!modal) return false;
@@ -35,6 +55,11 @@
         return true;
     }
 
+    /**
+     * Conecta toggle, backdrop, cierre y auto-cierre del sidebar en móvil.
+     *
+     * @returns {void}
+     */
     function initializeSidebar() {
         const toggle = document.querySelector("[data-sidebar-toggle]");
         const closeButton = document.querySelector("[data-sidebar-close]");
@@ -65,11 +90,20 @@
         });
     }
 
+    /**
+     * Observa cada modal para manejar `aria-hidden`, foco y scroll del body.
+     *
+     * @returns {void}
+     */
     function initializeModals() {
         document.querySelectorAll(".modal").forEach((modal) => {
             let lastFocusedElement = null;
             let wasOpen = modal.classList.contains("show") || modal.classList.contains("active");
 
+            /**
+             * Sincroniza `aria-hidden`, foco y bloqueo de scroll al abrir o cerrar.
+             * @returns {void}
+             */
             const updateModal = () => {
                 const isOpen = modal.classList.contains("show") || modal.classList.contains("active");
                 modal.setAttribute("aria-hidden", String(!isOpen));
@@ -100,6 +134,11 @@
         });
     }
 
+    /**
+     * Rellena los elementos `[data-current-date]` con la fecha actual.
+     *
+     * @returns {void}
+     */
     function initializeDateLabels() {
         const formatter = new Intl.DateTimeFormat("es-CO", {
             weekday: "long",
@@ -113,6 +152,11 @@
         });
     }
 
+    /**
+     * Limpia el mensaje de error del login cuando el usuario vuelve a escribir.
+     *
+     * @returns {void}
+     */
     function initializeLoginFeedback() {
         const form = document.getElementById("loginForm");
         const message = document.getElementById("mensajeLogin");

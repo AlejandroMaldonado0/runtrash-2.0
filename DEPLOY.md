@@ -100,7 +100,7 @@ Debe mostrar **solo** `.env.example` (si aparece) y **nunca** `servidor/.env`.
 |---|---|
 | `DATABASE_URL` | La connection string del Paso 1 |
 | `ADMIN_EMAIL` | El correo que quieras para el admin |
-| `ADMIN_PASSWORD` | Una clave **de mínimo 8 caracteres** |
+| `ADMIN_PASSWORD` | Una clave **de mínimo 8 caracteres, con letras y números** |
 
 4. Presiona **Apply**.
 
@@ -145,27 +145,99 @@ Debe mostrar algo como:
 
 ## Paso 5 · Entrar como administrador
 
-El administrador **no aparece en la pantalla de login** (es intencional).
-Entra directo a:
+El acceso de administrador **no aparece en el login público** (es
+intencional). Entra directo a:
 
 ```
 https://runtrash.onrender.com/admin.html
 ```
 
 Usa las credenciales que configuraste en `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
+El panel de administración vuelve a pedir la contraseña antes de mostrar
+datos sensibles.
 
 Desde ahí ya puedes crear los usuarios de la empresa y los operarios.
 
 ---
 
-## Paso 6 · Crear las cuentas de la empresa
+## Paso 6 · Crear las cuentas de empresa y operario
 
-Cuando una empresa se registra en la web, el sistema le asigna los
-operarios que tengan su misma localidad.
+El registro público de la web solo crea cuentas de **ciudadano**. Desde
+`admin.html`:
 
-Para que el reparto funcione, primero crea los operarios desde
-`admin.html` y asígnales una localidad ( Kennedy, Chapinero, Suba... ).
-Luego la empresa puede registrarse normalmente desde la web.
+1. Crea la cuenta de **empresa** indicando su nombre, correo y **NIT**.
+2. Crea los **operarios** asociándolos a esa empresa, con su localidad
+   asignada. Al crearlo, el panel muestra **una sola vez** un código de
+   verificación de 6 dígitos: entrégalo al operario.
+
+El **código de operario no se escribe a mano**: son los últimos cuatro
+dígitos del NIT de la empresa. Si varios operarios comparten empresa,
+todos usan el mismo código; la cuenta se distingue por el correo.
+
+La empresa ve a sus operarios en la sección **Equipo** de su panel y ahí
+genera o rota el código de verificación de cada uno. Al rotarlo se
+cierran las sesiones abiertas del operario.
+
+---
+
+## Paso 6.1 · Iniciar sesión con segundo factor
+
+- El **operario** introduce su correo, contraseña, el código del NIT
+  (últimos 4 dígitos) y el código de verificación de 6 dígitos que le
+  entregó su empresa. **Los dos códigos son obligatorios**: si la empresa
+  todavía no generó el código de verificación, el operario no puede
+  ingresar hasta que lo haga desde **Equipo** (o el administrador desde
+  el panel de usuarios).
+- La **empresa** introduce su correo, contraseña y NIT.
+- Los entes de control (Distrito, Policía y SSPD) entran en el grupo
+  **Empresa / organización** con su correo y contraseña.
+- El **administrador** no usa el login público: entra por `admin.html`.
+- El selector de perfil es solo una ayuda: manda el rol guardado en la
+  base de datos. Si la cuenta es de empresa u operario y se eligió otro
+  perfil, el formulario abre el rol correcto y pide el NIT o los códigos
+  que falten sin borrar el correo ni la contraseña.
+
+Tras cinco intentos fallidos la cuenta se bloquea 15 minutos. La
+contraseña debe tener al menos 8 caracteres e incluir letras y números.
+
+---
+
+## Paso 6.2 · Activar Google y Outlook (opcional)
+
+1. En **Google Cloud Console** crea un ID de cliente OAuth 2.0 de tipo
+   aplicación web y registra como URI de redirección:
+   `https://tu-sitio.onrender.com/api/auth/oauth/google/callback`.
+2. En **Microsoft Entra ID** registra una aplicación y agrega la URL:
+   `https://tu-sitio.onrender.com/api/auth/oauth/microsoft/callback`.
+3. En Render define estas variables de entorno:
+   - `OAUTH_BASE_URL=https://tu-sitio.onrender.com`
+   - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`
+   - `MICROSOFT_CLIENT_ID` y `MICROSOFT_CLIENT_SECRET`
+   - `OAUTH_STATE_SECRET` con un valor largo y aleatorio.
+
+Solo podrán entrar correos **ya registrados y activos** en RunTrash. Los
+operarios no usan OAuth: deben ingresar con sus dos códigos. Si las
+credenciales no están configuradas, los botones avisan que la opción no
+está disponible.
+
+### Modo demo local (sin credenciales reales)
+
+Para probar los botones sin registrar aplicaciones en Google ni en
+Microsoft, define `OAUTH_DEMO=1` en el `.env` local y reinicia el
+servidor. Los botones abren una pantalla del propio RunTrash donde se
+escribe el correo de una cuenta ya registrada; el servidor crea la
+sesión igual que en el flujo real.
+
+- Es solo para demostración: **no valida la identidad con Google ni con
+  Microsoft**.
+- Por seguridad solo se activa cuando `OAUTH_BASE_URL` apunta a
+  `localhost`. Para una demo remota controlada hay que definir además
+  `OAUTH_DEMO_REMOTO=1`; hacerlo abre el ingreso con cualquier correo
+  registrado, así que es responsabilidad de quien lo activa.
+- Los operarios siguen bloqueados y deben usar sus dos códigos.
+- Si existen credenciales reales (`GOOGLE_*` o `MICROSOFT_*`), el flujo
+  real tiene prioridad y el modo demo no se usa para ese proveedor.
+- **Nunca actives `OAUTH_DEMO` en producción.**
 
 ---
 
@@ -248,9 +320,10 @@ Imágenes: almacenamiento s3 (bucket uploads en us-east-2)
 Si aparece `(disco local, se perderan al redespliegar)`, es que falta
 alguna variable.
 
-> **Nota sobre seguridad:** las URLs de las fotos son públicas para quien
-> tenga el enlace (igual que antes). Si necesitas que solo los usuarios
-> con sesión puedan verlas, dilo y lo ajusto.
+> **Nota sobre seguridad:** las fotos de `/uploads/*` exigen sesión. La
+> API comprueba que quien pide la imagen sea el dueño del reporte, el
+> operario asignado, un rol global o una empresa con ese reporte en su
+> ámbito; una empresa nunca ve fotos de otra.
 
 ### La base de datos también se pausa
 
@@ -264,7 +337,7 @@ entra al panel de Neon y pulsa **Resume**. Tus datos siguen ahí.
 | Síntoma | Causa | Solución |
 |---|---|---|
 | "Conexión correcta" no aparece | `DATABASE_URL` mal pegada | Vuelve a copiarla del panel de Neon |
-| Sale `ADMIN_PASSWORD no está configurada` | La clave tiene menos de 8 caracteres | Pon una de 8 o más y redespliega |
+| Sale `ADMIN_PASSWORD no cumple la política` | La clave no tiene 8 caracteres o no mezcla letras y números | Corrige la variable y redespliega |
 | La web carga pero no conecta | `FRONTEND_DIR` vacía | Verifica que diga `/opt/render/project/src` |
 | "Demasiados intentos" al entrar | `TRUST_PROXY` en false | Ponlo en `true` y redespliega |
 | Los mapas no cargan | Sin salida a internet | El mapa necesita internet; no es problema del hosting |

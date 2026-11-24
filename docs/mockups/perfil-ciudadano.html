@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Perfil y centro de control del ciudadano en RunTrash.">
+    <title>RunTrash · Perfil ciudadano</title>
+
+    <!-- Tailwind CSS vía CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+                    keyframes: {
+                        shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
+                        pop: { '0%': { opacity: '0', transform: 'scale(.96) translateY(8px)' }, '100%': { opacity: '1', transform: 'scale(1) translateY(0)' } }
+                    },
+                    animation: {
+                        shimmer: 'shimmer 2.4s infinite',
+                        pop: 'pop .28s ease-out both'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        .rt-scroll { scrollbar-width: thin; scrollbar-color: #10b981 #f1f5f9; }
+        .rt-scroll::-webkit-scrollbar { width: 10px; }
+        .rt-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 999px; }
+        .rt-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #34d399, #0f766e);
+            border: 2px solid #f1f5f9;
+            border-radius: 999px;
+        }
+        .bg-grid {
+            background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+            background-size: 42px 42px;
+        }
+        .xp-bar::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 2.4s infinite;
+        }
+        summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(180deg); }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .001ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen overflow-hidden bg-slate-950 font-sans text-slate-900 antialiased selection:bg-emerald-200 selection:text-emerald-950">
+
+    <!-- Fondo decorativo -->
+    <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <div class="bg-grid absolute inset-0 opacity-60"></div>
+        <div class="absolute -left-32 -top-40 h-[32rem] w-[32rem] rounded-full bg-emerald-500/25 blur-3xl"></div>
+        <div class="absolute -right-40 top-1/3 h-[30rem] w-[30rem] rounded-full bg-teal-400/20 blur-3xl"></div>
+        <div class="absolute -bottom-52 left-1/3 h-[34rem] w-[34rem] rounded-full bg-lime-400/10 blur-3xl"></div>
+    </div>
+
+    <!-- Botón para reabrir la demo -->
+    <button id="reopenBtn" type="button"
+        class="fixed left-1/2 top-6 z-50 hidden -translate-x-1/2 items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-500/30 transition hover:bg-emerald-400 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200">
+        <span aria-hidden="true">👤</span> Abrir perfil de ciudadano
+    </button>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-slate-950/70 p-3 backdrop-blur-sm sm:p-6">
+        <section id="perfilModal" role="dialog" aria-modal="true" aria-labelledby="perfilTitulo" aria-describedby="perfilDescripcion"
+            class="relative my-auto max-h-[90vh] w-full max-w-[650px] animate-pop overflow-y-auto rounded-2xl bg-white shadow-2xl ring-1 ring-white/20 rt-scroll">
+
+            <!-- Cabecera -->
+            <header class="relative overflow-hidden rounded-t-2xl bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 px-5 pb-16 pt-5 sm:px-7 sm:pt-6">
+                <div class="pointer-events-none absolute -right-14 -top-20 h-56 w-56 rounded-full border-[22px] border-white/10" aria-hidden="true"></div>
+                <div class="pointer-events-none absolute -bottom-24 -left-20 h-64 w-64 rounded-full bg-lime-300/10 blur-2xl" aria-hidden="true"></div>
+
+                <div class="relative flex items-start justify-between gap-3">
+                    <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[.18em] text-emerald-50 backdrop-blur">
+                        <span class="h-1.5 w-1.5 rounded-full bg-lime-300"></span> Perfil ciudadano
+                    </span>
+                    <button id="closeBtn" type="button" aria-label="Cerrar perfil"
+                        class="grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition hover:rotate-90 hover:bg-white/20 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/30">
+                        <span aria-hidden="true" class="text-lg leading-none">×</span>
+                    </button>
+                </div>
+
+                <div class="relative mt-5 flex flex-col gap-5 sm:flex-row sm:items-end">
+                    <div class="relative mx-auto shrink-0 sm:mx-0">
+                        <div class="absolute -inset-1 rounded-full bg-gradient-to-tr from-amber-300 via-yellow-200 to-amber-400 opacity-90 blur-[2px]" aria-hidden="true"></div>
+                        <div class="relative grid h-24 w-24 place-items-center overflow-hidden rounded-full border-4 border-amber-300 bg-gradient-to-br from-lime-300 to-emerald-400 shadow-xl ring-4 ring-emerald-700/40">
+                            <img id="avatarImg" class="hidden h-full w-full object-cover" alt="Foto de perfil de Alejandro Maldonado">
+                            <span id="avatarInitials" class="text-3xl font-extrabold text-emerald-950">AM</span>
+                        </div>
+                        <span id="avatarNivel" class="absolute -left-1 -top-1 grid h-7 w-7 place-items-center rounded-full border-2 border-emerald-700 bg-amber-300 text-[11px] font-black text-amber-950 shadow-lg" title="Nivel actual">10</span>
+                        <button id="avatarBtn" type="button" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil"
+                            class="absolute -bottom-1 -right-1 grid h-9 w-9 place-items-center rounded-full border-2 border-emerald-700 bg-white text-base shadow-lg transition hover:scale-110 hover:bg-amber-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300">
+                            <span aria-hidden="true">📷</span>
+                        </button>
+                        <input id="avatarInput" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+                    </div>
+
+                    <div class="min-w-0 flex-1 text-center sm:text-left">
+                        <p class="text-[10px] font-bold uppercase tracking-[.2em] text-emerald-200/80">Bienvenido de vuelta</p>
+                        <h1 id="perfilTitulo" class="mt-1 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">alejandro maldonado</h1>
+                        <p id="perfilDescripcion" class="mt-1 text-sm text-emerald-100/85">alejandro.maldonado@runtrash.co</p>
+                        <div class="mt-3 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-3 py-1.5 text-[11px] font-bold text-amber-100 sm:justify-start">
+                            <span id="nivelBadge">Nivel 10 - Ciudadano Estrella ⭐</span>
+                            <span class="rounded-full bg-amber-300 px-2 py-0.5 text-[9px] font-black text-amber-950">TOP 5%</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Cuerpo -->
+            <div class="relative z-10 space-y-5 px-4 pb-0 sm:px-6">
+                <!-- Gamificación -->
+                <section class="-mt-9 rounded-2xl border border-emerald-100 bg-white p-4 shadow-xl shadow-emerald-950/5 sm:p-5" aria-labelledby="xpTitulo">
+                    <div class="flex items-start justify-between gap-2 sm:gap-3">
+                        <div class="flex items-center gap-3">
+                            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-100 to-amber-200 text-xl shadow-inner sm:h-11 sm:w-11" aria-hidden="true">⚡</span>
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-[.16em] text-emerald-700">Progreso de nivel</p>
+                                <h2 id="xpTitulo" class="text-sm font-extrabold text-slate-900 sm:text-base">Tu energía ciudadana</h2>
+                            </div>
+                        </div>
+                        <div class="shrink-0 text-right">
+                            <p class="whitespace-nowrap text-xs font-extrabold text-slate-900 sm:text-sm"><span id="xpActual">450</span> <span class="text-slate-400">/</span> <span id="xpMeta">600</span> <span class="text-[10px] font-bold text-slate-400">XP</span></p>
+                            <p id="xpPorcentaje" class="whitespace-nowrap text-[9px] font-semibold text-emerald-600 sm:text-[10px]">75% completado</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div id="xpProgress" class="relative h-3 overflow-hidden rounded-full bg-slate-100 ring-1 ring-inset ring-slate-200" role="progressbar" aria-labelledby="xpTitulo" aria-valuemin="0" aria-valuemax="600" aria-valuenow="450">
+                            <div id="xpBar" class="xp-bar relative h-full w-[75%] overflow-hidden rounded-full bg-gradient-to-r from-amber-400 via-lime-400 to-emerald-500 transition-[width] duration-700 ease-out"></div>
+                        </div>
+                        <div class="mt-2 flex flex-col justify-between gap-1 text-[10px] font-semibold text-slate-500 sm:flex-row">
+                            <span id="xpFaltante">Te faltan 150 XP para el Nivel 11</span>
+                            <span><span id="xpTotal">2.450</span> XP acumulados</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex flex-wrap gap-1.5">
+                        <span class="rounded-full bg-amber-50 px-2.5 py-1 text-[9px] font-bold text-amber-700 ring-1 ring-amber-100">🎯 +100 XP por reporte resuelto</span>
+                        <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold text-emerald-700 ring-1 ring-emerald-100">📨 +50 XP por reporte enviado</span>
+                        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[9px] font-bold text-blue-700 ring-1 ring-blue-100">📍 +20 XP con foto y ubicación</span>
+                    </div>
+
+                    <details class="mt-3 rounded-xl border border-slate-100 bg-slate-50/70">
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-[11px] font-bold text-slate-600 transition hover:text-emerald-700">
+                            Ver todas las reglas de XP
+                            <span class="chevron text-[10px] text-slate-400 transition-transform" aria-hidden="true">▼</span>
+                        </summary>
+                        <div class="grid gap-1.5 border-t border-slate-100 p-3 text-[10px] font-semibold text-slate-600 sm:grid-cols-2">
+                            <span>📨 +50 · Reporte enviado</span>
+                            <span>📍 +20 · Foto y geolocalización</span>
+                            <span>🚛 +30 · Cambia a En proceso</span>
+                            <span>✅ +100 · Reporte completado</span>
+                            <span>🔥 +50 · Racha semanal</span>
+                        </div>
+                    </details>
+
+                    <div class="mt-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/60 p-2.5">
+                        <div class="mb-2 flex items-center justify-between gap-2">
+                            <p class="text-[9px] font-extrabold uppercase tracking-[.14em] text-emerald-700">Prueba el sistema de XP</p>
+                            <button id="resetDemo" type="button" class="text-[9px] font-bold text-emerald-600 underline decoration-emerald-300 underline-offset-2 transition hover:text-emerald-800">Reiniciar</button>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button type="button" data-xp-action="REPORTE_ENVIADO" aria-label="Sumar 50 XP por reporte enviado" class="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-emerald-700 hover:ring-emerald-300">📨 +50</button>
+                            <button type="button" data-xp-action="FOTO_GEOLOCALIZACION" aria-label="Sumar 20 XP por foto y geolocalización" class="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-emerald-700 hover:ring-emerald-300">📍 +20</button>
+                            <button type="button" data-xp-action="EN_PROCESO" aria-label="Sumar 30 XP por reporte en proceso" class="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-emerald-700 hover:ring-emerald-300">🚛 +30</button>
+                            <button type="button" data-xp-action="COMPLETADO" aria-label="Sumar 100 XP por reporte completado" class="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-emerald-700 hover:ring-emerald-300">✅ +100</button>
+                            <button type="button" data-xp-action="RACHA_SEMANAL" aria-label="Sumar 50 XP por racha semanal" class="rounded-lg bg-white px-2.5 py-1.5 text-[10px] font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:text-emerald-700 hover:ring-emerald-300">🔥 +50</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Métricas -->
+                <section aria-labelledby="kpiTitulo">
+                    <div class="flex items-end justify-between gap-3">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[.16em] text-emerald-700">Resumen</p>
+                            <h2 id="kpiTitulo" class="text-base font-extrabold text-slate-900">Tus reportes</h2>
+                        </div>
+                        <p class="max-w-[150px] text-right text-[9px] font-medium leading-tight text-slate-400">Toca una tarjeta para filtrar el historial</p>
+                    </div>
+
+                    <div class="mt-2.5 grid grid-cols-3 gap-2.5">
+                        <button type="button" data-filter="pendiente" aria-pressed="false" class="rounded-xl border border-amber-100 bg-amber-50 p-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300">
+                            <span class="grid h-8 w-8 place-items-center rounded-lg bg-amber-100 text-amber-600" aria-hidden="true">🕓</span>
+                            <span data-count="pendiente" class="mt-2 block text-2xl font-extrabold leading-none text-amber-600">3</span>
+                            <span class="mt-1 block text-[10px] font-bold uppercase tracking-wide text-amber-700">Pendientes</span>
+                        </button>
+                        <button type="button" data-filter="proceso" aria-pressed="false" class="rounded-xl border border-blue-100 bg-blue-50 p-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+                            <span class="grid h-8 w-8 place-items-center rounded-lg bg-blue-100 text-blue-600" aria-hidden="true">🚛</span>
+                            <span data-count="proceso" class="mt-2 block text-2xl font-extrabold leading-none text-blue-600">2</span>
+                            <span class="mt-1 block text-[10px] font-bold uppercase tracking-wide text-blue-700">En proceso</span>
+                        </button>
+                        <button type="button" data-filter="completado" aria-pressed="false" class="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300">
+                            <span class="grid h-8 w-8 place-items-center rounded-lg bg-emerald-100 text-emerald-600" aria-hidden="true">✅</span>
+                            <span data-count="completado" class="mt-2 block text-2xl font-extrabold leading-none text-emerald-600">10</span>
+                            <span class="mt-1 block text-[10px] font-bold uppercase tracking-wide text-emerald-700">Completados</span>
+                        </button>
+                    </div>
+
+                    <div class="mt-2.5 rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="text-[10px] font-bold uppercase tracking-[.12em] text-slate-500">Índice de efectividad</p>
+                            <p class="text-xs font-black text-emerald-700"><span id="efectividadPct">67</span>%</p>
+                        </div>
+                        <div id="efectividadProgress" class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" aria-label="Índice de efectividad" aria-valuemin="0" aria-valuemax="100" aria-valuenow="67">
+                            <div id="efectividadBar" class="h-full w-[67%] rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-[width] duration-700"></div>
+                        </div>
+                        <p id="efectividadTexto" class="mt-1.5 text-[10px] font-medium text-slate-500">10 de 15 reportes completados</p>
+                    </div>
+                </section>
+
+                <!-- Historial -->
+                <section aria-labelledby="actividadTitulo">
+                    <div class="flex items-end justify-between gap-3">
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-[.16em] text-emerald-700">Historial de actividad</p>
+                            <h2 id="actividadTitulo" class="text-base font-extrabold text-slate-900">Últimos movimientos</h2>
+                        </div>
+                        <button id="verTodosBtn" type="button" class="rounded-full bg-slate-100 px-3 py-1.5 text-[10px] font-bold text-slate-600 transition hover:bg-emerald-100 hover:text-emerald-700">Ver todos</button>
+                    </div>
+                    <p id="filtroActual" class="mt-1 text-[10px] font-semibold text-slate-500" aria-live="polite">Todos los movimientos</p>
+
+                    <div id="actividadLista" class="mt-2.5 space-y-2.5">
+                        <article data-estado="completado" class="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+                            <div class="flex items-start gap-3">
+                                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-emerald-100 text-lg text-emerald-700 ring-1 ring-emerald-200/60" aria-hidden="true">♻️</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p class="text-[9px] font-bold uppercase tracking-[.14em] text-emerald-600">Reciclaje</p>
+                                            <h3 class="text-[13px] font-bold leading-snug text-slate-800">Punto de reciclaje saturado</h3>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[9px] font-extrabold text-emerald-700">Completado</span>
+                                    </div>
+                                    <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-slate-500">
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">🕒</span> Hoy, 10:24 a. m.</span>
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">📍</span> Chapinero, Bogotá</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article data-estado="proceso" class="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+                            <div class="flex items-start gap-3">
+                                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime-100 text-lg text-lime-700 ring-1 ring-lime-200/60" aria-hidden="true">🌿</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p class="text-[9px] font-bold uppercase tracking-[.14em] text-lime-700">Zonas verdes</p>
+                                            <h3 class="text-[13px] font-bold leading-snug text-slate-800">Poda pendiente en el parque</h3>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-[9px] font-extrabold text-blue-700">En proceso</span>
+                                    </div>
+                                    <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-slate-500">
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">🕒</span> Hoy, 9:05 a. m.</span>
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">📍</span> Usaquén, Bogotá</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article data-estado="pendiente" class="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+                            <div class="flex items-start gap-3">
+                                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-orange-100 text-lg text-orange-700 ring-1 ring-orange-200/60" aria-hidden="true">🚧</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p class="text-[9px] font-bold uppercase tracking-[.14em] text-orange-700">Vía pública</p>
+                                            <h3 class="text-[13px] font-bold leading-snug text-slate-800">Escombros en la ciclorruta</h3>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-[9px] font-extrabold text-amber-700">Pendiente</span>
+                                    </div>
+                                    <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-slate-500">
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">🕒</span> Ayer, 4:40 p. m.</span>
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">📍</span> Suba, Bogotá</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article data-estado="completado" class="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+                            <div class="flex items-start gap-3">
+                                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-emerald-100 text-lg text-emerald-700 ring-1 ring-emerald-200/60" aria-hidden="true">🧴</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p class="text-[9px] font-bold uppercase tracking-[.14em] text-emerald-600">Reciclaje</p>
+                                            <h3 class="text-[13px] font-bold leading-snug text-slate-800">Contenedor comunitario sin tapa</h3>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-emerald-100 px-2.5 py-1 text-[9px] font-extrabold text-emerald-700">Completado</span>
+                                    </div>
+                                    <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-slate-500">
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">🕒</span> Ayer, 11:10 a. m.</span>
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">📍</span> Teusaquillo, Bogotá</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+
+                        <article data-estado="proceso" class="group rounded-xl border border-slate-100 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+                            <div class="flex items-start gap-3">
+                                <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-lime-100 text-lg text-lime-700 ring-1 ring-lime-200/60" aria-hidden="true">🌳</span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <p class="text-[9px] font-bold uppercase tracking-[.14em] text-lime-700">Zonas verdes</p>
+                                            <h3 class="text-[13px] font-bold leading-snug text-slate-800">Árbol con riesgo de caída</h3>
+                                        </div>
+                                        <span class="shrink-0 rounded-full bg-blue-100 px-2.5 py-1 text-[9px] font-extrabold text-blue-700">En proceso</span>
+                                    </div>
+                                    <p class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-slate-500">
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">🕒</span> 12 nov, 2:15 p. m.</span>
+                                        <span class="inline-flex items-center gap-1"><span aria-hidden="true">📍</span> Engativá, Bogotá</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div id="actividadVacia" class="mt-2.5 hidden rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center">
+                        <p class="text-2xl" aria-hidden="true">🌱</p>
+                        <p class="mt-1 text-xs font-bold text-slate-700">No hay movimientos en este estado</p>
+                        <p class="mt-0.5 text-[10px] text-slate-500">Prueba con otro filtro para ver tu actividad.</p>
+                    </div>
+                </section>
+
+                <!-- Pie / credencial -->
+                <footer class="-mx-4 rounded-b-2xl border-t border-slate-100 bg-slate-50/80 px-4 pb-4 pt-4 sm:-mx-6 sm:px-6">
+                    <div class="flex items-center justify-between gap-2 rounded-xl border border-slate-200/80 bg-white px-3 py-2.5 shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="grid h-8 w-8 place-items-center rounded-lg bg-emerald-100 text-sm" aria-hidden="true">👤</span>
+                            <div>
+                                <p class="text-[8px] font-bold uppercase tracking-[.14em] text-slate-400">Rol</p>
+                                <p class="text-[11px] font-extrabold text-slate-700">Ciudadano</p>
+                            </div>
+                        </div>
+                        <div class="h-7 w-px bg-slate-200"></div>
+                        <div class="flex items-center gap-2">
+                            <span class="grid h-8 w-8 place-items-center rounded-lg bg-amber-100 text-sm" aria-hidden="true">📅</span>
+                            <div>
+                                <p class="text-[8px] font-bold uppercase tracking-[.14em] text-slate-400">Miembro desde</p>
+                                <p class="text-[11px] font-extrabold text-slate-700">2026</p>
+                            </div>
+                        </div>
+                        <span class="hidden rounded-full bg-emerald-100 px-2 py-1 text-[8px] font-black uppercase tracking-wide text-emerald-700 sm:inline">Activo</span>
+                    </div>
+
+                    <button id="logoutBtn" type="button" class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-600/25 transition duration-200 hover:-translate-y-0.5 hover:bg-emerald-700 hover:shadow-xl hover:shadow-emerald-600/30 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 active:translate-y-0">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+                        </svg>
+                        Cerrar sesión
+                    </button>
+                    <p class="mt-2 text-center text-[9px] font-medium text-slate-400">RunTrash · Tu ciudad, más limpia contigo</p>
+                </footer>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toasts -->
+    <div id="toastContainer" class="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex flex-col items-center gap-2 px-4" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+        (() => {
+            "use strict";
+
+            /* ---------- Reglas de gamificación ---------- */
+            const REGLAS_XP = Object.freeze({
+                REPORTE_ENVIADO: { puntos: 50, etiqueta: "Reporte enviado", icono: "📨" },
+                FOTO_GEOLOCALIZACION: { puntos: 20, etiqueta: "Foto y ubicación exacta", icono: "📍" },
+                EN_PROCESO: { puntos: 30, etiqueta: "Reporte en proceso", icono: "🚛" },
+                COMPLETADO: { puntos: 100, etiqueta: "Reporte completado", icono: "✅" },
+                RACHA_SEMANAL: { puntos: 50, etiqueta: "Racha semanal", icono: "🔥" }
+            });
+
+            /*
+            Hitos de la escala: Nivel 5 desde 500 XP, Nivel 10 desde 2000 XP
+            y Nivel 20+ desde 5000 XP. Los cortes intermedios permiten que el
+            perfil arranque en 450/600 XP dentro del Nivel 10.
+            */
+            const UMBRALES = [0, 100, 200, 350, 500, 700, 950, 1250, 1600, 2000,
+                2600, 3100, 3500, 3900, 4300, 4600, 4800, 4900, 4950, 5000];
+
+            const TITULOS = [
+                { desde: 0, titulo: "Observador Urbano", emoji: "👁️" },
+                { desde: 500, titulo: "Colaborador Activo", emoji: "🚴" },
+                { desde: 2000, titulo: "Ciudadano Estrella", emoji: "⭐" },
+                { desde: 5000, titulo: "Guardián de la Ciudad", emoji: "🏙️🏆" }
+            ];
+
+            const estado = {
+                totalXP: 2450,
+                counts: { pendiente: 3, proceso: 2, completado: 10 },
+                filtro: "todos"
+            };
+
+            const formatoXP = new Intl.NumberFormat("es-CO");
+
+            /* ---------- Cálculo dinámico de nivel ---------- */
+            function nivelDesdeXP(totalXP) {
+                if (totalXP >= 5000) return 20 + Math.floor((totalXP - 5000) / 1000);
+                let nivel = 1;
+                UMBRALES.forEach((umbral, indice) => {
+                    if (totalXP >= umbral) nivel = indice + 1;
+                });
+                return nivel;
+            }
+
+            function tituloDesdeXP(totalXP) {
+                return [...TITULOS].reverse().find((item) => totalXP >= item.desde) || TITULOS[0];
+            }
+
+            function datosNivel(totalXP) {
+                const nivel = nivelDesdeXP(totalXP);
+                const inicio = nivel >= 20 ? 5000 + (nivel - 20) * 1000 : UMBRALES[nivel - 1];
+                const siguiente = nivel >= 20 ? inicio + 1000 : UMBRALES[nivel];
+                const xpEnNivel = totalXP - inicio;
+                const xpNecesario = siguiente - inicio;
+                return {
+                    nivel,
+                    inicio,
+                    siguiente,
+                    xpEnNivel,
+                    xpNecesario,
+                    porcentaje: Math.round((xpEnNivel / xpNecesario) * 100),
+                    ...tituloDesdeXP(totalXP)
+                };
+            }
+
+            function calcularXPReporte({ enviado, conFotoGeo, enProceso, completado, rachaSemanal }) {
+                return (enviado ? REGLAS_XP.REPORTE_ENVIADO.puntos : 0)
+                    + (conFotoGeo ? REGLAS_XP.FOTO_GEOLOCALIZACION.puntos : 0)
+                    + (enProceso ? REGLAS_XP.EN_PROCESO.puntos : 0)
+                    + (completado ? REGLAS_XP.COMPLETADO.puntos : 0)
+                    + (rachaSemanal ? REGLAS_XP.RACHA_SEMANAL.puntos : 0);
+            }
+
+            /* ---------- Render de XP y métricas ---------- */
+            function renderXP() {
+                const datos = datosNivel(estado.totalXP);
+                const barra = document.getElementById("xpBar");
+                const progreso = document.getElementById("xpProgress");
+
+                document.getElementById("nivelBadge").textContent =
+                    `Nivel ${datos.nivel} - ${datos.titulo} ${datos.emoji}`;
+                document.getElementById("avatarNivel").textContent =
+                    datos.nivel > 20 ? "20+" : String(datos.nivel);
+                document.getElementById("xpActual").textContent = formatoXP.format(datos.xpEnNivel);
+                document.getElementById("xpMeta").textContent = formatoXP.format(datos.xpNecesario);
+                document.getElementById("xpPorcentaje").textContent = `${datos.porcentaje}% completado`;
+                document.getElementById("xpFaltante").textContent =
+                    `Te faltan ${formatoXP.format(datos.xpNecesario - datos.xpEnNivel)} XP para el Nivel ${datos.nivel + 1}`;
+                document.getElementById("xpTotal").textContent = formatoXP.format(estado.totalXP);
+
+                barra.style.width = `${datos.porcentaje}%`;
+                barra.setAttribute("aria-valuenow", String(datos.porcentaje));
+                progreso.setAttribute("aria-valuemax", String(datos.xpNecesario));
+                progreso.setAttribute("aria-valuenow", String(datos.xpEnNivel));
+            }
+
+            function renderKpis() {
+                document.querySelectorAll("[data-count]").forEach((nodo) => {
+                    nodo.textContent = String(estado.counts[nodo.dataset.count] || 0);
+                });
+
+                const total = Object.values(estado.counts).reduce((suma, valor) => suma + valor, 0);
+                const porcentaje = total ? Math.round((estado.counts.completado / total) * 100) : 0;
+                const barra = document.getElementById("efectividadBar");
+                const progreso = document.getElementById("efectividadProgress");
+
+                document.getElementById("efectividadPct").textContent = String(porcentaje);
+                document.getElementById("efectividadTexto").textContent =
+                    `${estado.counts.completado} de ${total} reportes completados`;
+                barra.style.width = `${porcentaje}%`;
+                progreso.setAttribute("aria-valuenow", String(porcentaje));
+            }
+
+            /* ---------- Otorgar XP y actualizar nivel ---------- */
+            function otorgarXP(clave) {
+                const regla = REGLAS_XP[clave];
+                if (!regla) return;
+
+                const nivelAnterior = datosNivel(estado.totalXP).nivel;
+                estado.totalXP += regla.puntos;
+
+                renderXP();
+                mostrarToast(`${regla.icono} +${regla.puntos} XP · ${regla.etiqueta}`, "success");
+
+                const nivelActual = datosNivel(estado.totalXP).nivel;
+                if (nivelActual > nivelAnterior) {
+                    setTimeout(() => {
+                        mostrarToast(`🎉 ¡Subiste al Nivel ${nivelActual}! Sigue cuidando la ciudad.`, "level");
+                    }, 360);
+                }
+            }
+
+            /* ---------- Filtro del historial ---------- */
+            function aplicarFiltro(filtro) {
+                estado.filtro = filtro;
+                const etiquetas = { pendiente: "Pendientes", proceso: "En proceso", completado: "Completados" };
+                const tarjetas = [...document.querySelectorAll("#actividadLista [data-estado]")];
+                let visibles = 0;
+
+                tarjetas.forEach((tarjeta) => {
+                    const mostrar = filtro === "todos" || tarjeta.dataset.estado === filtro;
+                    tarjeta.classList.toggle("hidden", !mostrar);
+                    if (mostrar) visibles += 1;
+                });
+
+                document.getElementById("actividadVacia").classList.toggle("hidden", visibles > 0);
+                document.getElementById("filtroActual").textContent =
+                    filtro === "todos" ? "Todos los movimientos" : `Mostrando: ${etiquetas[filtro]}`;
+
+                document.querySelectorAll("[data-filter]").forEach((boton) => {
+                    const activo = boton.dataset.filter === filtro;
+                    const color = { pendiente: "ring-amber-300", proceso: "ring-blue-300", completado: "ring-emerald-300" }[filtro];
+                    boton.setAttribute("aria-pressed", String(activo));
+                    boton.classList.remove("ring-2", "ring-offset-1", "ring-amber-300", "ring-blue-300", "ring-emerald-300");
+                    if (activo) {
+                        boton.classList.add("ring-2", "ring-offset-1", color);
+                    }
+                });
+            }
+
+            /* ---------- Toasts ---------- */
+            function mostrarToast(mensaje, tipo = "success") {
+                const contenedor = document.getElementById("toastContainer");
+                const toast = document.createElement("div");
+                const estilos = tipo === "error"
+                    ? "bg-rose-600 text-white"
+                    : tipo === "level"
+                        ? "bg-amber-300 text-amber-950"
+                        : "bg-slate-900 text-white";
+                const icono = tipo === "error" ? "⚠️" : tipo === "level" ? "🎉" : "✅";
+
+                toast.className = `pointer-events-auto flex max-w-md translate-y-3 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold opacity-0 shadow-xl transition-all duration-300 ${estilos}`;
+                toast.innerHTML = `<span aria-hidden="true">${icono}</span><span>${mensaje}</span>`;
+                contenedor.appendChild(toast);
+
+                requestAnimationFrame(() => {
+                    toast.classList.remove("translate-y-3", "opacity-0");
+                });
+
+                setTimeout(() => {
+                    toast.classList.add("translate-y-3", "opacity-0");
+                    setTimeout(() => toast.remove(), 320);
+                }, 2700);
+            }
+
+            /* ---------- Modal ---------- */
+            const overlay = document.getElementById("modalOverlay");
+            const modal = document.getElementById("perfilModal");
+            const closeBtn = document.getElementById("closeBtn");
+            const reopenBtn = document.getElementById("reopenBtn");
+            let focoAnterior = null;
+
+            function abrirModal() {
+                focoAnterior = document.activeElement;
+                overlay.classList.remove("hidden");
+                reopenBtn.classList.add("hidden");
+                reopenBtn.classList.remove("inline-flex");
+                document.body.classList.add("overflow-hidden");
+                closeBtn.focus({ preventScroll: true });
+            }
+
+            function cerrarModal() {
+                overlay.classList.add("hidden");
+                reopenBtn.classList.remove("hidden");
+                reopenBtn.classList.add("inline-flex");
+                document.body.classList.remove("overflow-hidden");
+                (focoAnterior || reopenBtn).focus?.({ preventScroll: true });
+            }
+
+            closeBtn.addEventListener("click", cerrarModal);
+            reopenBtn.addEventListener("click", abrirModal);
+            overlay.addEventListener("click", (evento) => {
+                if (evento.target === overlay) cerrarModal();
+            });
+
+            document.addEventListener("keydown", (evento) => {
+                if (evento.key === "Escape" && !overlay.classList.contains("hidden")) {
+                    cerrarModal();
+                }
+            });
+
+            modal.addEventListener("keydown", (evento) => {
+                if (evento.key !== "Tab") return;
+                const enfocables = [...modal.querySelectorAll(
+                    "button, [href], input, summary, [tabindex]:not([tabindex='-1'])"
+                )].filter((nodo) => !nodo.disabled && nodo.offsetParent !== null);
+                if (!enfocables.length) return;
+
+                const primero = enfocables[0];
+                const ultimo = enfocables[enfocables.length - 1];
+                if (evento.shiftKey && document.activeElement === primero) {
+                    evento.preventDefault();
+                    ultimo.focus();
+                } else if (!evento.shiftKey && document.activeElement === ultimo) {
+                    evento.preventDefault();
+                    primero.focus();
+                }
+            });
+
+            /* ---------- Foto de perfil ---------- */
+            const avatarBtn = document.getElementById("avatarBtn");
+            const avatarInput = document.getElementById("avatarInput");
+            const avatarImg = document.getElementById("avatarImg");
+            const avatarInitials = document.getElementById("avatarInitials");
+
+            avatarBtn.addEventListener("click", () => avatarInput.click());
+
+            avatarInput.addEventListener("change", () => {
+                const archivo = avatarInput.files?.[0];
+                if (!archivo) return;
+                if (!archivo.type.startsWith("image/")) {
+                    mostrarToast("Elige una imagen PNG, JPG o WEBP.", "error");
+                    return;
+                }
+                if (archivo.size > 5 * 1024 * 1024) {
+                    mostrarToast("La imagen no puede superar los 5 MB.", "error");
+                    return;
+                }
+
+                const lector = new FileReader();
+                lector.onload = (evento) => {
+                    avatarImg.src = String(evento.target?.result || "");
+                    avatarImg.classList.remove("hidden");
+                    avatarInitials.classList.add("hidden");
+                    mostrarToast("Foto de perfil actualizada.", "success");
+                };
+                lector.readAsDataURL(archivo);
+                avatarInput.value = "";
+            });
+
+            /* ---------- Acciones de la demo ---------- */
+            document.querySelectorAll("[data-xp-action]").forEach((boton) => {
+                boton.addEventListener("click", () => otorgarXP(boton.dataset.xpAction));
+            });
+
+            document.querySelectorAll("[data-filter]").forEach((boton) => {
+                boton.addEventListener("click", () => {
+                    const filtro = boton.dataset.filter;
+                    aplicarFiltro(estado.filtro === filtro ? "todos" : filtro);
+                });
+            });
+
+            document.getElementById("verTodosBtn").addEventListener("click", () => aplicarFiltro("todos"));
+
+            document.getElementById("resetDemo").addEventListener("click", () => {
+                estado.totalXP = 2450;
+                estado.counts = { pendiente: 3, proceso: 2, completado: 10 };
+                renderXP();
+                renderKpis();
+                aplicarFiltro("todos");
+                mostrarToast("Demo reiniciada en el Nivel 10.", "success");
+            });
+
+            const logoutBtn = document.getElementById("logoutBtn");
+            const logoutHTML = logoutBtn.innerHTML;
+            logoutBtn.addEventListener("click", () => {
+                logoutBtn.disabled = true;
+                logoutBtn.classList.add("cursor-wait", "opacity-80");
+                logoutBtn.textContent = "Cerrando sesión…";
+                mostrarToast("Sesión cerrada. ¡Gracias por cuidar la ciudad!", "success");
+                setTimeout(() => {
+                    logoutBtn.disabled = false;
+                    logoutBtn.classList.remove("cursor-wait", "opacity-80");
+                    logoutBtn.innerHTML = logoutHTML;
+                    cerrarModal();
+                }, 1100);
+            });
+
+            /* ---------- Estado inicial ---------- */
+            renderXP();
+            renderKpis();
+            aplicarFiltro("todos");
+        })();
+    </script>
+</body>
+</html>

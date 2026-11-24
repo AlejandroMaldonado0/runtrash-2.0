@@ -1,39 +1,30 @@
+/**
+ * @file Almacenamiento de imágenes de los reportes.
+ *
+ * Elige automáticamente entre dos modos:
+ *
+ * 1. Disco local (desarrollo y pruebas): `STORAGE_PROVIDER` vacío o
+ *    `local`. Las imágenes quedan en `servidor/uploads`.
+ * 2. Neon Object Storage (producción, compatible con S3): se activa con
+ *    `STORAGE_PROVIDER=s3` más endpoint, bucket y credenciales.
+ *
+ * En ambos casos la API guarda el mismo valor en `imagen_url`
+ * (`/uploads/nombre.jpg`), así que el frontend no cambia.
+ *
+ * @module lib/almacen
+ */
+
 const fs = require('node:fs');
 const path = require('node:path');
 
-/*
-=========================================================
-RunTrash · Almacenamiento de imágenes
-=========================================================
-Elige automáticamente entre dos modos:
-
-1. Disco local (desarrollo y pruebas)
-   Se usan las variables STORAGE_PROVIDER vacías o "local".
-   Las imágenes quedan en servidor/uploads.
-
-2. Neon Object Storage (producción, compatible con S3)
-   Se activa al definir STORAGE_PROVIDER=s3 junto con
-   STORAGE_S3_ENDPOINT, STORAGE_S3_BUCKET y las credenciales.
-   Las imágenes sobreviven a los redespliegues, porque ya no
-   viven en el disco temporal del servidor.
-
-En ambos casos la API guarda el mismo valor en la columna
-imagen_url ("/uploads/nombre.jpg"), así que el frontend no
-necesita ningún cambio.
-=========================================================
-*/
-
 const PROVEEDOR = String(process.env.STORAGE_PROVIDER || 'local').toLowerCase();
 
-/*
-Limpia un valor de entorno.
-
-Al copiar desde el bloque .env de Neon es facil pegar tambien las
-comillas, por ejemplo:
-    AWS_ENDPOINT_URL_S3="https://...aws.neon.tech"
-Con las comillas dentro, el SDK de S3 lanza "Invalid URL".
-Aqui se quitan comillas, espacios y saltos de linea.
-*/
+/**
+ * Limpia un valor de entorno (comillas, espacios y saltos de línea).
+ *
+ * @param {string} valor - Valor crudo de `process.env`.
+ * @returns {string} Valor limpio.
+ */
 function limpiar(valor) {
     return String(valor ?? '')
         .trim()
@@ -57,6 +48,10 @@ const faltaConfiguracion = [
     ['STORAGE_S3_SECRET_ACCESS_KEY', configuracionS3.secretAccessKey]
 ].filter(([, valor]) => !String(valor).trim()).map(([nombre]) => nombre);
 
+/**
+ * Indica si el endpoint configurado es una URL HTTP(S) válida.
+ * @type {boolean}
+ */
 const endpointValido = (() => {
     if (!configuracionS3.endpoint) return false;
     try {
@@ -110,6 +105,12 @@ Nombres de archivo: siempre con la extension ya validada.
 Se anteponen carpetas por año/mes para no saturar un solo
 directorio cuando haya muchos reportes.
 */
+/**
+ * Genera una clave única dentro del bucket o del disco local.
+ *
+ * @param {string} extension - Extensión ya validada (`.jpg`, `.png`, `.webp`).
+ * @returns {string} Ruta relativa con formato `AAAA/MM/reporte_xxx.ext`.
+ */
 function generarNombreArchivo(extension) {
     const marcas = [
         Date.now().toString(36),
@@ -123,15 +124,22 @@ function generarNombreArchivo(extension) {
     return `${anio}/${mes}/reporte_${marcas}${extension}`;
 }
 
+/**
+ * Devuelve el modo de almacenamiento activo.
+ *
+ * @returns {'s3'|'local'} Modo en uso.
+ */
 function modo() {
     return usarS3 ? 's3' : 'local';
 }
 
-/*
-Guarda el buffer y devuelve la ruta publica
-("2026/10/reporte_xxx.jpg"). La ruta siempre es relativa;
-el servidor la expone en /uploads/.
-*/
+/**
+ * Guarda el buffer y devuelve la ruta pública relativa.
+ *
+ * @param {Buffer} buffer - Contenido de la imagen.
+ * @param {string} extension - Extensión validada.
+ * @returns {Promise<string>} Clave como `2026/10/reporte_xxx.jpg`.
+ */
 async function guardar(buffer, extension) {
     const clave = generarNombreArchivo(extension);
 
@@ -154,11 +162,12 @@ async function guardar(buffer, extension) {
     return clave;
 }
 
-/*
-Lee una imagen guardada. Se usa para servir /uploads/* cuando
-el almacenamiento es remoto, porque en ese caso no hay archivo
-en el disco.
-*/
+/**
+ * Lee una imagen guardada (S3 o disco local).
+ *
+ * @param {string} clave - Ruta relativa devuelta por `guardar`.
+ * @returns {Promise<{cuerpo: Buffer|Uint8Array, tipo: string}>} Bytes y MIME.
+ */
 async function leer(clave) {
     if (usarS3) {
         const { GetObjectCommand } = require('@aws-sdk/client-s3');
@@ -190,6 +199,12 @@ async function leer(clave) {
     };
 }
 
+/**
+ * Elimina una imagen del almacenamiento activo.
+ *
+ * @param {string} clave - Ruta relativa; se ignora si viene vacía.
+ * @returns {Promise<void>}
+ */
 async function eliminar(clave) {
     if (!clave) return;
 
@@ -207,10 +222,13 @@ async function eliminar(clave) {
     await fs.promises.unlink(destino);
 }
 
-/*
-Comprueba que una clave no se escape del directorio uploads.
-Bloquea rutas tipo ../../.env
-*/
+/**
+ * Comprueba que una clave no se escape del directorio de uploads.
+ * Bloquea rutas como `../../.env`.
+ *
+ * @param {string} clave - Ruta recibida desde la URL.
+ * @returns {boolean} `true` si es segura.
+ */
 function claveSegura(clave) {
     const limpio = String(clave || '').replace(/\\/g, '/');
     if (limpio.includes('..')) return false;
@@ -218,6 +236,11 @@ function claveSegura(clave) {
     return limpio.length > 0;
 }
 
+/**
+ * Resume la configuración de almacenamiento para logs y diagnóstico.
+ *
+ * @returns {{modo: string, bucket: string|null, region: string|null, faltaConfiguracion: string[]}} Estado.
+ */
 function resumen() {
     return {
         modo: modo(),
