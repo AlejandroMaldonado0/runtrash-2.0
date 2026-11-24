@@ -180,6 +180,33 @@ cierran las sesiones abiertas del operario.
 
 ---
 
+## Paso 6.0 · Cuentas de demostración (opcional)
+
+Si necesitas probar la web con cuentas ya creadas en vez de crearlas a
+mano, agrega en Render → **Environment**:
+
+```
+SEED_DEMO_ACCOUNTS=true
+```
+
+y vuelve a desplegar. La migración `013_cuentas_demo_ui.sql` crea:
+
+| Cuenta | Contraseña | Datos extra |
+|---|---|---|
+| `ui.ciudadano@runtrash.test` | `UiTest2026!` | — |
+| `ui.empresa@runtrash.test` | `UiTest2026!` | NIT `900123456-7` |
+| `ui.operario@runtrash.test` | `UiTest2026!` | código NIT `4567`, verificación `650721` |
+| `distrito@runtrash.test` | ver `.credenciales-demo.local.md` | rol Distrito |
+| `policia@runtrash.test` | ver `.credenciales-demo.local.md` | rol Policía |
+| `sspd@runtrash.test` | ver `.credenciales-demo.local.md` | rol SSPD |
+
+**Advertencia:** son cuentas con contraseñas conocidas y quedan en una URL
+pública. Úsalas solo para una demostración, cambia las contraseñas o
+desactívalas al terminar. Si quitas `SEED_DEMO_ACCOUNTS`, el próximo
+despliegue desactiva automáticamente todas las cuentas `@runtrash.test`.
+
+---
+
 ## Paso 6.1 · Iniciar sesión con segundo factor
 
 - El **operario** introduce su correo, contraseña, el código del NIT
