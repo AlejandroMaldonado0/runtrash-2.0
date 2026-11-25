@@ -248,6 +248,7 @@ const frontendDir = String(process.env.FRONTEND_DIR || '').trim()
 
 const ARCHIVOS_PUBLICOS = [
     'index.html',
+    '404.html',
     'ciudadano.html',
     'empresa.html',
     'operario.html',
@@ -306,8 +307,23 @@ if (frontendDir && fs.existsSync(frontendDir)) {
     console.log(`Frontend servido desde ${frontendDir}`);
 }
 
-app.use((_req, res) => {
-    res.status(404).json({
+/*
+Ruta no encontrada: para peticiones GET de la interfaz (fuera de /api)
+se entrega la pagina 404 con el diseno de la aplicacion. El resto de los
+casos (recursos de API no encontrados, metodos no soportados) responde JSON
+con el formato de error de la API.
+*/
+app.use((req, res) => {
+    const esRutaInterfaz = req.method === 'GET'
+        && !req.path.startsWith('/api/')
+        && Boolean(frontendDir)
+        && fs.existsSync(frontendDir);
+
+    if (esRutaInterfaz) {
+        return res.status(404).sendFile(path.join(frontendDir, '404.html'));
+    }
+
+    return res.status(404).json({
         ok: false,
         mensaje: 'Ruta no encontrada.'
     });

@@ -1,0 +1,113 @@
+/* =========================================================
+   RUNTRASH · ERROR 404
+   Modulo: frontend/styles/15-error404.css
+   Se importa desde styles.css respetando el orden de cascada.
+   ========================================================= */
+
+/* Pagina de error 404 (ruta no encontrada). Se sirve para peticiones
+   GET de la interfaz que no corresponden a una pagina existente, con el
+   mismo sistema visual de RunTrash (tokens, radios y sombras). */
+
+.error-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: clamp(16px, 3vw, 40px);
+    background:
+        radial-gradient(circle at 8% 12%, rgba(216, 243, 106, 0.25), transparent 25%),
+        radial-gradient(circle at 88% 88%, rgba(69, 211, 131, 0.18), transparent 27%),
+        linear-gradient(145deg, #e8f5ec 0%, #f7faf8 46%, #edf6f0 100%);
+}
+
+.error-page .error-card {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    padding: clamp(34px, 6vw, 58px) clamp(22px, 5vw, 48px);
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 32px;
+    box-shadow: var(--shadow-lg);
+}
+
+.error-page .error-logo {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+}
+
+.error-page .error-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.error-page .error-codigo {
+    font-size: clamp(76px, 20vw, 132px);
+    line-height: 0.95;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--brand-800);
+}
+
+.error-page .error-titulo {
+    margin-top: 8px;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.error-page .error-texto {
+    margin: 12px auto 0;
+    max-width: 42ch;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.error-page .error-accion {
+    display: inline-flex;
+    width: auto;
+    margin-top: 26px;
+    padding: 13px 22px;
+    border: none;
+    border-radius: 12px;
+    background: #2e7d32;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.error-page .error-accion:hover,
+.error-page .error-accion:focus-visible {
+    background: #256628;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(46, 125, 50, 0.20);
+}
+
+.error-page .error-secundaria {
+    display: block;
+    width: fit-content;
+    margin: 14px auto 0;
+    color: var(--brand-700);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.error-page .error-secundaria:hover,
+.error-page .error-secundaria:focus-visible {
+    color: var(--brand-900);
+    text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+    .error-page .error-card {
+        padding: 30px 20px;
+    }
+}
