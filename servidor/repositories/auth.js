@@ -113,10 +113,11 @@ async function crearUsuario(client, datos) {
             codigo_operario,
             zona_asignada,
             empresa_id,
-            nit_empresa
+            nit_empresa,
+            fecha_nacimiento
         )
         VALUES
-        ($1,$2,$3,$4,$5,$6,$7,$8)
+        ($1,$2,$3,$4,$5,$6,$7,$8,$9)
         RETURNING
             id,
             nombre,
@@ -126,17 +127,19 @@ async function crearUsuario(client, datos) {
             zona_asignada,
             empresa_id,
             nit_empresa,
-            activo
+            activo,
+            fecha_nacimiento
         `,
         [
             datos.nombre,
             datos.correo,
             datos.passwordHash,
             datos.tipoUsuario,
-            datos.codigoOperario,
+            datos.codigoOperativo,
             datos.zonaAsignada,
             datos.empresaId,
-            datos.nitEmpresa
+            datos.nitEmpresa,
+            datos.fechaNacimiento || null
         ]
     );
 
@@ -164,6 +167,7 @@ async function buscarUsuarioLogin(correo) {
             u.nit_empresa,
             u.avatar_url,
             u.fecha_registro,
+            u.fecha_nacimiento,
             u.activo,
             u.intentos_fallidos,
             u.bloqueado_hasta,

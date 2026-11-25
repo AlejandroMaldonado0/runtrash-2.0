@@ -73,9 +73,15 @@ async function registrarUsuario() {
     const email = document.getElementById("registroEmail").value.trim().toLowerCase();
     const password = document.getElementById("registroPassword").value;
     const password2 = document.getElementById("registroPassword2").value;
+    const fechaNacimiento = document.getElementById("registroFechaNacimiento").value;
 
     if (!nombre || !email || !password || !password2) {
         mostrarError("Completa todos los campos obligatorios.");
+        return;
+    }
+
+    if (!fechaNacimiento) {
+        mostrarError("Completa tu fecha de nacimiento.");
         return;
     }
 
@@ -104,7 +110,8 @@ async function registrarUsuario() {
                 nombre: nombre,
                 correo: email,
                 password: password,
-                tipo_usuario: "ciudadano"
+                tipo_usuario: "ciudadano",
+                fecha_nacimiento: fechaNacimiento
             })
         });
 

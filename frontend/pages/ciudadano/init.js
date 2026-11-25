@@ -13,6 +13,40 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector(".user-info strong").textContent = usuarioActual.nombre;
         document.querySelector(".user-info span").textContent = usuarioActual.correo || "Usuario RunTrash";
     }
+
+    /*
+    La bienvenida saluda al usuario por su nombre y, si hoy es su
+    cumpleaños, cambia el mensaje por uno de felicitación.
+    */
+    const bienvenidaTitulo = document.getElementById("welcomeTitulo");
+    const bienvenidaTexto = document.querySelector(".welcome-copy p");
+
+    if (usuarioActual?.nombre) {
+        if (bienvenidaTitulo) {
+            bienvenidaTitulo.textContent = `¡Hola! Bienvenido, ${usuarioActual.nombre}!`;
+        }
+    }
+
+    const fechaNacimiento = String(usuarioActual?.fecha_nacimiento || "").trim().slice(0, 10);
+    const partesFecha = fechaNacimiento.split("-");
+    const mesCumple = Number(partesFecha[1]);
+    const diaCumple = Number(partesFecha[2]);
+    const hoy = new Date();
+    const esCumpleaños =
+        Boolean(usuarioActual?.nombre) &&
+        partesFecha.length === 3 &&
+        Number.isFinite(mesCumple) &&
+        Number.isFinite(diaCumple) &&
+        (hoy.getMonth() + 1) === mesCumple &&
+        hoy.getDate() === diaCumple;
+
+    if (esCumpleaños) {
+        if (bienvenidaTexto) {
+            bienvenidaTexto.textContent = `¡Feliz cumpleaños, ${usuarioActual.nombre}! 🎉 Hoy celebramos tu día.`;
+        }
+    } else if (bienvenidaTexto) {
+        bienvenidaTexto.textContent = "Ayuda a mantener limpia nuestra ciudad.";
+    }
     fetch(`${API}/api/configuracion/publica`)
         .then((response) => response.json())
         .then((data) => {

@@ -29,7 +29,8 @@ router.post('/registro', authLimiter, async (req, res) => {
             nombre,
             correo,
             password,
-            tipo_usuario
+            tipo_usuario,
+            fecha_nacimiento
         } = req.body;
 
         const tipoSolicitado = String(tipo_usuario || 'ciudadano').trim();
@@ -51,6 +52,15 @@ router.post('/registro', authLimiter, async (req, res) => {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Faltan datos obligatorios.'
+            });
+        }
+
+        const fechaNacimientoSolicitada = String(fecha_nacimiento || '').trim();
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaNacimientoSolicitada)) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La fecha de nacimiento es obligatoria y no es válida.'
             });
         }
 
@@ -97,7 +107,8 @@ router.post('/registro', authLimiter, async (req, res) => {
                 codigoOperario: null,
                 zonaAsignada: null,
                 empresaId: null,
-                nitEmpresa: null
+                nitEmpresa: null,
+                fechaNacimiento: fecha_nacimiento
             });
 
             await client.query('COMMIT');
