@@ -39,6 +39,22 @@ const ROLES_PERMITIDOS = new Set([
 ]);
 
 /**
+ * Determina si el usuario autenticado es el administrador principal, es
+ * decir, la cuenta inicial creada desde `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+ *
+ * @param {object} usuario - Usuario cargado desde la sesión.
+ * @returns {boolean} `true` solo para el administrador principal.
+ */
+function esAdministradorPrincipal(usuario) {
+    if (usuario?.tipo_usuario !== 'admin') return false;
+
+    const correoPrincipal = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    const correoUsuario = String(usuario?.correo || '').trim().toLowerCase();
+
+    return Boolean(correoPrincipal) && correoUsuario === correoPrincipal;
+}
+
+/**
  * Resuelve y valida la empresa asociada a una cuenta.
  *
  * @param {object} datos
@@ -178,6 +194,18 @@ router.post('/admin/usuarios', requiereAdmin, async (req, res) => {
             });
         }
 
+        /*
+        Solo el administrador principal (definido por `ADMIN_EMAIL`) puede
+        otorgar el rol de administrador. Los demás administradores creados
+        desde el panel no pueden volver a administrar.
+        */
+        if (tipo_usuario === 'admin' && !esAdministradorPrincipal(req.usuarioAutenticado)) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: 'Solo el administrador principal puede otorgar el rol de administrador.'
+            });
+        }
+
         const validacionPassword = validarPassword(password);
 
         if (!validacionPassword.ok) {
@@ -303,6 +331,18 @@ router.put('/admin/usuarios/:id', requiereAdmin, async (req, res) => {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Completa los datos obligatorios.'
+            });
+        }
+
+        /*
+        Solo el administrador principal (definido por `ADMIN_EMAIL`) puede
+        otorgar el rol de administrador. Los demás administradores creados
+        desde el panel no pueden volver a administrar.
+        */
+        if (tipo_usuario === 'admin' && !esAdministradorPrincipal(req.usuarioAutenticado)) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: 'Solo el administrador principal puede otorgar el rol de administrador.'
             });
         }
 
