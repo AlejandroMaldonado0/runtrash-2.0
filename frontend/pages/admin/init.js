@@ -11,6 +11,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     features = window.RunTrashFeatures;
     document.getElementById("configForm").addEventListener("submit", guardarConfiguracion);
 
+    const usuariosBusqueda = document.getElementById("usuariosBusqueda");
+    const usuariosFiltroRol = document.getElementById("usuariosFiltroRol");
+
+    usuariosBusqueda?.addEventListener("input", () => renderUsuarios());
+    usuariosFiltroRol?.addEventListener("change", () => renderUsuarios());
+
     if (!token || usuarioActual?.tipo_usuario !== "admin") {
         mostrarGate();
         return;

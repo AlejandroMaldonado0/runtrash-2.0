@@ -115,13 +115,47 @@
         <section class="section" id="usuarios">
             <div class="section-header reports-header">
                 <div><h2>Usuarios del sistema</h2><p class="section-subtitle">Crea cuentas, asigna roles y controla su acceso.</p></div>
-                <div class="section-actions"><button class="toolbar-button" type="button" data-accion="abrirCrearUsuario">＋ Crear usuario</button></div>
+                <div class="section-actions">
+                    <input
+                        type="search"
+                        id="usuariosBusqueda"
+                        class="admin-usuarios-busqueda"
+                        placeholder="Buscar usuario o correo…"
+                        aria-label="Buscar usuario o correo"
+                    >
+                    <select
+                        id="usuariosFiltroRol"
+                        class="admin-usuarios-filtro"
+                    >
+                        <option value="">Todos los roles</option>
+                        <option value="ciudadano">Ciudadano</option>
+                        <option value="operario">Operario</option>
+                        <option value="empresa">Empresa</option>
+                        <option value="admin">Administrador</option>
+                        <option value="distrito">Distrito</option>
+                        <option value="policia">Policía</option>
+                        <option value="sspd">SSPD</option>
+                    </select>
+                    <button class="toolbar-button" type="button" data-accion="abrirCrearUsuario">＋ Crear usuario</button>
+                </div>
             </div>
             <div class="admin-table-wrap">
                 <table class="admin-table">
                     <thead><tr><th>Usuario</th><th>Rol</th><th>Zona / NIT</th><th>Reportes</th><th>Estado</th><th>Acciones</th></tr></thead>
                     <tbody id="adminUsuariosTabla"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <section class="section" id="accesosRoles">
+            <div class="section-header">
+                <div><h2>Acceso a otros roles</h2><p class="section-subtitle">Ingresa desde el administrador al panel de otro rol.</p></div>
+            </div>
+            <div class="section-actions admin-acceso-roles">
+                <a class="toolbar-button" href="ciudadano.html">👤 Ciudadano</a>
+                <a class="toolbar-button" href="operario.html">👷 Operario</a>
+                <a class="toolbar-button" href="empresa.html">🏢 Empresa</a>
+                <a class="toolbar-button" href="control.html">🚓 Distrito / Policía / SSPD</a>
             </div>
         </section>
 

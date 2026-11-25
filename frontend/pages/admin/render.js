@@ -49,7 +49,16 @@ function renderSectores() {
  */
 function renderUsuarios() {
     const body = document.getElementById("adminUsuariosTabla");
-    body.innerHTML = usuarios.map((user) => {
+    const busqueda = (document.getElementById("usuariosBusqueda")?.value || "").trim().toLowerCase();
+    const filtroRol = document.getElementById("usuariosFiltroRol")?.value || "";
+    const usuariosFiltrados = usuarios.filter((user) => {
+        if (filtroRol && user.tipo_usuario !== filtroRol) return false;
+        if (!busqueda) return true;
+        const nombre = String(user.nombre || "").toLowerCase();
+        const correo = String(user.correo || "").toLowerCase();
+        return nombre.includes(busqueda) || correo.includes(busqueda);
+    });
+    body.innerHTML = usuariosFiltrados.map((user) => {
         const rolInfo = ({
             ciudadano: { emoji: "👤", etiqueta: "Ciudadano" },
             operario: { emoji: "👷", etiqueta: "Operario" },
