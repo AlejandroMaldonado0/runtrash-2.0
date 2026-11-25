@@ -178,7 +178,12 @@ function datosExportacion() {
         report.descripcion,
         textoEstado(report.estado),
         report.operario || "Sin asignar",
-        fechaBonita(report.fecha)
+        fechaBonita(report.fecha),
+        report.ciudadano || "Sin información",
+        report.empresa || "Sin empresa",
+        (report.latitud && report.longitud)
+            ? `${Number(report.latitud).toFixed(6)}, ${Number(report.longitud).toFixed(6)}`
+            : "Sin coordenadas"
     ]);
 }
 
@@ -192,7 +197,7 @@ function exportarExcel() {
     if (!rows.length) return mostrarToast("No hay reportes para exportar con el filtro actual.");
     features.downloadCSV(
         `runtrash-reportes-${new Date().toISOString().slice(0, 10)}.csv`,
-        ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha"],
+        ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas"],
         rows
     );
     mostrarToast("Archivo CSV compatible con Excel descargado.");
@@ -210,13 +215,15 @@ function exportarPDF() {
         features.printPDF({
             title: "Reporte de gestión RunTrash",
             subtitle: `Filtro: ${document.getElementById("filtroActivo").textContent} · Generado el ${fechaBonita(new Date())}`,
-            headers: ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha"],
+            headers: ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas"],
             rows,
             summary: [
                 { label: "Total", value: rows.length },
                 { label: "Pendientes", value: rows.filter((row) => row[5] === "Pendiente").length },
                 { label: "En proceso", value: rows.filter((row) => row[5] === "En proceso").length },
-                { label: "Completados", value: rows.filter((row) => row[5] === "Completado").length }
+                { label: "Completados", value: rows.filter((row) => row[5] === "Completado").length },
+                { label: "Con asignación", value: rows.filter((row) => row[6] !== "Sin asignar").length },
+                { label: "Sin asignación", value: rows.filter((row) => row[6] === "Sin asignar").length }
             ]
         });
     } catch (error) {
