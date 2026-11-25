@@ -77,6 +77,12 @@ async function autorizarImagen(req, res, next) {
 
     try {
         const usuario = req.usuarioAutenticado;
+
+        /*
+        La misma ruta sirve la foto del ciudadano y la evidencia que
+        adjunta el operario al completar. Por eso se buscan las dos
+        columnas antes de comprobar los permisos del reporte.
+        */
         const resultado = await pool.query(
             `
             SELECT
@@ -95,6 +101,7 @@ async function autorizarImagen(req, res, next) {
             FROM reportes r
             LEFT JOIN usuarios o ON o.id = r.operario_id
             WHERE r.imagen_url = $1
+               OR r.imagen_operario_url = $1
             LIMIT 1
             `,
             [`/uploads/${clave}`, usuario.empresa_id || null]

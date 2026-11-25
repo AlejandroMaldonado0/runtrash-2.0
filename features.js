@@ -347,7 +347,7 @@
         navegador muestra el icono de imagen rota, asi que se
         reemplaza por el icono del tipo de residuo.
         */
-        reporteImagen(apiBase, reporte, clase = "report-thumb", icono = "🗑️") {
+        reporteImagen(apiBase, reporte, clase = "report-thumb", icono = "🗑️", alt = "Foto del reporte") {
             if (!reporte?.imagen_url) {
                 return `<div class="${clase} report-thumb-vacio" aria-hidden="true">${icono}</div>`;
             }
@@ -367,10 +367,54 @@
                 + (token ? `${separador}token=${encodeURIComponent(token)}` : "")
             );
 
-            return `<img class="${clase}" src="${url}" alt="Foto del reporte"
+            return `<img class="${clase}" src="${url}" alt="${this.escapeHTML(alt)}"
                         loading="lazy"
                         data-accion="imagenNoDisponible" data-pasar="elemento"
                         data-clase="${this.escapeHTML(clase)}" data-icono="${this.escapeHTML(icono)}">`;
+        },
+
+        /**
+         * Pinta juntas las fotos de un reporte: la del ciudadano que lo
+         * creó y la evidencia que adjuntó el operario al completarlo.
+         *
+         * Se usa en el detalle de todos los paneles con acceso al
+         * reporte (ciudadano, operario, empresa, control y admin) para
+         * que ambas imágenes se distingan con su etiqueta.
+         *
+         * @param {string} apiBase - Base de la API.
+         * @param {object} reporte - Reporte con `imagen_url` e `imagen_operario_url`.
+         * @param {string} [clase="detail-image"] - Clase de la imagen.
+         * @param {string} [icono="🗑️"] - Icono de respaldo si la foto no carga.
+         * @returns {string} HTML con las fotos disponibles o cadena vacía.
+         */
+        reporteFotos(apiBase, reporte, clase = "detail-image", icono = "🗑️") {
+            if (!reporte) return "";
+
+            const fotos = [];
+
+            if (reporte.imagen_url) {
+                fotos.push(`<figure class="report-foto">
+                    <figcaption>Foto del ciudadano</figcaption>
+                    ${this.reporteImagen(apiBase, reporte, clase, icono, "Foto del ciudadano")}
+                </figure>`);
+            }
+
+            if (reporte.imagen_operario_url) {
+                fotos.push(`<figure class="report-foto">
+                    <figcaption>Foto del operario</figcaption>
+                    ${this.reporteImagen(
+                        apiBase,
+                        { ...reporte, imagen_url: reporte.imagen_operario_url },
+                        clase,
+                        icono,
+                        "Foto del operario"
+                    )}
+                </figure>`);
+            }
+
+            return fotos.length
+                ? `<div class="detail-fotos">${fotos.join("")}</div>`
+                : "";
         },
 
         /**
@@ -734,7 +778,7 @@
 
         const visible = campo.type === "text";
         campo.type = visible ? "password" : "text";
-        boton.textContent = visible ? "\u{1F441}" : "\u{1F441}\u200D\u{1F648}";
+        boton.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="6.5"/><circle cx="12" cy="12" r="2.8"/></svg>';
         boton.setAttribute(
             "aria-label",
             visible ? "Mostrar contraseña" : "Ocultar contraseña"

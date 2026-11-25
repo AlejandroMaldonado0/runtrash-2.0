@@ -133,6 +133,13 @@
     cursor: pointer;
 }
 
+/* Marca el campo cuando el GPS acaba de elegir la localidad. */
+.dashboard-page .input-group select.campo-detectado {
+    background: rgba(18, 184, 102, 0.08);
+    border-color: rgba(18, 184, 102, 0.5);
+    box-shadow: 0 0 0 4px rgba(18, 184, 102, 0.12);
+}
+
 .dashboard-page input[type="file"] {
     padding: 8px;
     color: var(--muted);
@@ -185,16 +192,35 @@
 
 .dashboard-page .detail-fotos {
     display: grid;
-    gap: 10px;
+    gap: 12px;
+    margin: 14px 0;
+}
+
+.dashboard-page .report-foto {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.dashboard-page .report-foto figcaption {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .dashboard-page .estado-foto {
     margin-top: 12px;
+    padding: 12px;
+    background: var(--brand-50);
+    border: 1px solid var(--brand-100);
+    border-radius: 14px;
 }
 
 .dashboard-page .estado-foto-label {
     display: block;
-    color: rgba(255, 255, 255, 0.72);
+    color: var(--ink-soft);
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.06em;
@@ -204,12 +230,16 @@
 
 .dashboard-page .estado-foto input[type="file"] {
     width: 100%;
-    color: #eafff1;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px dashed rgba(217, 247, 108, 0.55);
+    color: var(--muted);
+    background: #fff;
+    border: 1px dashed var(--brand-300);
     border-radius: 12px;
     padding: 10px;
     font-size: 12px;
+}
+
+.dashboard-page .estado-foto .file-help {
+    color: var(--ink-soft);
 }
 
 

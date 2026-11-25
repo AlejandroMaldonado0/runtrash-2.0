@@ -62,6 +62,7 @@ function restablecerFiltro() {
  * @returns {void}
  */
 function cerrarDetalles() {
+    limpiarPreviewFotoOperario();
     document.getElementById("modalDetalles").classList.remove("show");
 }
 

@@ -39,8 +39,7 @@ async function verReporte(id) {
                 <div class="detail-row"><span class="detail-label">Fecha</span><div class="detail-value">${features.escapeHTML(new Date(reporte.fecha).toLocaleString("es-CO"))}</div></div>
             </div>
 
-            ${reporte.imagen_url ? `<div class="report-detail-image">${features.reporteImagen(API, reporte, "detail-thumb", "🗑️")}</div>` : ""}
-            ${reporte.imagen_operario_url ? `<div class="report-detail-image">${features.reporteImagen(API, { ...reporte, imagen_url: reporte.imagen_operario_url }, "detail-thumb", "🗑️")}</div>` : ""}
+            ${features.reporteFotos(API, reporte, "detail-thumb", "🗑️")}
 
             <h4 class="modal-section-title">Historial de seguimientos${esAdmin ? "" : ` · ${features.escapeHTML(nombreEnte)}`}</h4>
             <p class="section-subtitle">${esAdmin

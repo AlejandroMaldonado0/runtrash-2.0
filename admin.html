@@ -27,7 +27,7 @@
         <p>Ingresa las credenciales de administrador para continuar.</p>
         <form id="adminLoginForm" data-accion="iniciarSesionAdmin" data-pasar="evento">
             <div class="input-group"><label for="adminLoginEmail">Correo</label><input id="adminLoginEmail" type="email" autocomplete="username" required></div>
-            <div class="input-group"><label for="adminLoginPassword">Contraseña</label><div class="password-field"><input id="adminLoginPassword" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-accion="togglePassword" data-target="adminLoginPassword" aria-label="Mostrar contraseña">👁</button></div></div>
+            <div class="input-group"><label for="adminLoginPassword">Contraseña</label><div class="password-field"><input id="adminLoginPassword" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" data-accion="togglePassword" data-target="adminLoginPassword" aria-label="Mostrar contraseña"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="12" rx="10" ry="6.5"/><circle cx="12" cy="12" r="2.8"/></svg></button></div></div>
             <div class="mensaje error" id="adminLoginMessage" hidden></div>
             <button class="admin-primary-button full-admin-button" id="adminLoginButton" type="submit">Entrar al panel</button>
         </form>

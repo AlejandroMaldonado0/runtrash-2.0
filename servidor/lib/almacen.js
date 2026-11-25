@@ -8,8 +8,9 @@
  * 2. Neon Object Storage (producción, compatible con S3): se activa con
  *    `STORAGE_PROVIDER=s3` más endpoint, bucket y credenciales.
  *
- * En ambos casos la API guarda el mismo valor en `imagen_url`
- * (`/uploads/nombre.jpg`), así que el frontend no cambia.
+ * En ambos casos la API guarda la ruta pública (`/uploads/nombre.jpg`)
+ * en `imagen_url` (foto del ciudadano) o `imagen_operario_url`
+ * (evidencia del operario), así que el frontend no cambia.
  *
  * @module lib/almacen
  */

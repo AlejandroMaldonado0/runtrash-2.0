@@ -115,8 +115,7 @@ function verReporte(id) {
     document.getElementById("modalCard").classList.add("modal-card-wide");
     document.getElementById("modalContenido").innerHTML = `
         <div class="detail-hero"><div class="report-icon">🗑️</div><div><span class="status ${claseEstado(report.estado)}">${textoEstado(report.estado)}</span><h3>${item.tipo}</h3><p>${fechaBonita(report.fecha)}</p></div></div>
-        ${report.imagen_url ? features.reporteImagen(API, report, "detail-image", "🗑️") : ""}
-        ${report.imagen_operario_url ? features.reporteImagen(API, { ...report, imagen_url: report.imagen_operario_url }, "detail-image", "🗑️") : ""}
+        ${features.reporteFotos(API, report, "detail-image", "🗑️")}
         <div class="detail-grid">
             <div class="detail-row"><span class="detail-label">Localidad</span><div class="detail-value">📍 ${item.localidad}</div></div>
             <div class="detail-row"><span class="detail-label">Ubicación</span><div class="detail-value">🧭 ${item.ubicacion}</div></div>

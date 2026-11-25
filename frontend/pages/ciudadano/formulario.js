@@ -20,7 +20,7 @@ function abrirNuevoReporte() {
     document.getElementById("modalContenido").innerHTML = `
         <div class="form-intro">
             <span aria-hidden="true">📍</span>
-            <p><strong>Ubicación automática</strong><br>El GPS se activará al abrir el formulario. También puedes escribir la dirección manualmente.</p>
+            <p><strong>Ubicación automática</strong><br>El GPS se activará al abrir el formulario y elegirá tu localidad. También puedes escribir la dirección manualmente.</p>
         </div>
         <div class="input-group">
             <label for="nuevoTipo">Tipo de residuo</label>
@@ -62,6 +62,17 @@ function abrirNuevoReporte() {
         <button class="primary" id="enviarReporteButton" type="button" data-accion="guardarReporte">📤 Enviar reporte</button>`;
 
     document.getElementById("modal").classList.add("show");
+
+    /*
+    Si el ciudadano cambia la localidad a mano, dejamos de
+    sobrescribirla con la detección del GPS.
+    */
+    const selectLocalidad = document.getElementById("nuevaLocalidad");
+    selectLocalidad.addEventListener("change", () => {
+        delete selectLocalidad.dataset.detectado;
+        selectLocalidad.classList.remove("campo-detectado");
+    });
+
     usarUbicacion();
 }
 
@@ -130,17 +141,29 @@ function usarUbicacion() {
     button.textContent = "⏳ Ubicando";
     status.textContent = "Obteniendo tu ubicación...";
 
+    /*
+    El GPS tarda unos segundos: el dataset de localidades se descarga
+    en paralelo y queda listo para resolver el punto.
+    */
+    if (typeof LocalidadesBogota !== "undefined") {
+        LocalidadesBogota.cargar().catch(() => {});
+    }
+
     navigator.geolocation.getCurrentPosition(
         (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+            const precision = Math.round(position.coords.accuracy);
+
             document.getElementById("nuevaLatitud").value = latitude;
             document.getElementById("nuevaLongitud").value = longitude;
             document.getElementById("nuevaUbicacion").value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-            status.textContent = `GPS activo · precisión aproximada: ${Math.round(position.coords.accuracy)} m`;
-            status.className = position.coords.accuracy <= 20 ? "field-status is-success" : "field-status is-warning";
+            status.textContent = `GPS activo · precisión aproximada: ${precision} m`;
+            status.className = precision <= 20 ? "field-status is-success" : "field-status is-warning";
             button.disabled = false;
             button.textContent = "✓ GPS";
+
+            ubicarLocalidad(latitude, longitude, precision);
         },
         (error) => {
             const messages = {
@@ -155,6 +178,55 @@ function usarUbicacion() {
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
+}
+
+/**
+ * Selecciona la localidad que corresponde a las coordenadas del GPS.
+ *
+ * Respeta una localidad elegida a mano: solo escribe en el campo si
+ * está vacío o si el valor anterior lo puso esta misma detección.
+ *
+ * @param {number} latitude - Latitud del GPS.
+ * @param {number} longitude - Longitud del GPS.
+ * @param {number} precision - Precisión en metros.
+ * @returns {Promise<void>}
+ */
+async function ubicarLocalidad(latitude, longitude, precision) {
+    const select = document.getElementById("nuevaLocalidad");
+    const status = document.getElementById("gpsStatus");
+
+    if (!select || !status || typeof LocalidadesBogota === "undefined") return;
+
+    const base = `GPS activo · precisión aproximada: ${precision} m`;
+    status.textContent = `${base} · detectando localidad...`;
+
+    try {
+        const localidad = await LocalidadesBogota.detectar(latitude, longitude);
+        if (!status.isConnected || !select.isConnected) return;
+
+        if (!localidad) {
+            status.textContent = `${base} · no pudimos detectar la localidad, selecciónala manualmente.`;
+            status.className = "field-status is-warning";
+            return;
+        }
+
+        const elegidaAMano = select.value !== "" && select.dataset.detectado !== "1";
+
+        if (!elegidaAMano) {
+            select.value = localidad;
+            select.dataset.detectado = "1";
+            select.classList.add("campo-detectado");
+        }
+
+        status.textContent = elegidaAMano
+            ? `${base} · localidad detectada: ${localidad}`
+            : `GPS activo · ${localidad} · precisión aproximada: ${precision} m`;
+        status.className = precision <= 20 ? "field-status is-success" : "field-status is-warning";
+    } catch (error) {
+        if (!status.isConnected) return;
+        status.textContent = `${base} · selecciona la localidad manualmente.`;
+        status.className = "field-status is-warning";
+    }
 }
 
 /**

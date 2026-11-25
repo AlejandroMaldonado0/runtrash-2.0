@@ -37,10 +37,10 @@ async function purgarReportesRetirados() {
         */
         const aBorrar = await pool.query(
             `
-            SELECT id, imagen_url
+            SELECT id, imagen_url, imagen_operario_url
             FROM reportes
             WHERE fecha < NOW() - ($1 * INTERVAL '1 day')
-              AND imagen_url IS NOT NULL
+              AND (imagen_url IS NOT NULL OR imagen_operario_url IS NOT NULL)
             `,
             [dias]
         );
@@ -60,14 +60,24 @@ async function purgarReportesRetirados() {
         resto.
         */
         await mapaConcurrente(aBorrar.rows, 4, async (reporte) => {
+            /*
+            Cada reporte puede tener dos fotos: la del ciudadano y la
+            evidencia que adjuntó el operario al completarlo. Ambas se
+            borran para no dejar archivos huérfanos.
+            */
+            const imagenes = [
+                reporte.imagen_url,
+                reporte.imagen_operario_url
+            ].filter(Boolean);
+
             try {
-                await almacen.eliminar(
-                    String(reporte.imagen_url).replace(/^\/uploads\//, '')
-                );
+                await Promise.all(imagenes.map((imagen) => almacen.eliminar(
+                    String(imagen).replace(/^\/uploads\//, '')
+                )));
                 return true;
             } catch (errorImagen) {
                 console.error(
-                    `No se pudo borrar la imagen del reporte ${reporte.id}:`,
+                    `No se pudo borrar una imagen del reporte ${reporte.id}:`,
                     errorImagen
                 );
                 return false;
