@@ -34,7 +34,8 @@ const ROLES_PERMITIDOS = new Set([
     'empresa',
     'distrito',
     'policia',
-    'sspd'
+    'sspd',
+    'admin'
 ]);
 
 /**
