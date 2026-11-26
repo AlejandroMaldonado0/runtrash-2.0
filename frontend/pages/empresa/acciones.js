@@ -51,6 +51,43 @@ async function actualizarLocalidadOperario(elemento, operarioId) {
     }
 }
 
+/**
+ * Guarda la nueva localidad elegida para un operario desde el panel.
+ *
+ * @param {number} operarioId - Identificador del operario.
+ * @returns {Promise<void>}
+ */
+async function guardarLocalidadOperario(operarioId) {
+    const operario = operarios.find((item) => Number(item.id) === Number(operarioId));
+
+    if (!operario) {
+        return mostrarToast("Operario no encontrado.");
+    }
+
+    const select = document.getElementById(`operarioZona_${Number(operarioId)}`);
+    const zona = String(select?.value || "").trim() || null;
+
+    try {
+        const respuesta = await features.apiFetch(`${API}/api/operarios/${Number(operarioId)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ zona_asignada: zona })
+        });
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(resultado.mensaje || "No se pudo actualizar la localidad.");
+        }
+
+        operario.zona_asignada = zona;
+        renderEquipo();
+        mostrarToast("Localidad actualizada.");
+        cargarDatos(true).catch(() => {});
+    } catch (error) {
+        mostrarToast(error.message || "No se pudo actualizar la localidad.");
+    }
+}
+
 async function asignarAutomaticamente() {
     const unassigned = reportes.filter((report) => report.estado === "pendiente" && !report.operario_id);
     const button = document.getElementById("autoAssignButton");
