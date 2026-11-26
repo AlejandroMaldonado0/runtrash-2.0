@@ -169,11 +169,45 @@ function reportesVisibles() {
  *
  * @returns {Array<Array<*>>} Filas listas para exportar.
  */
+function localidadReporte(report) {
+    const declarada = String(report.localidad || "").trim();
+    if (declarada && declarada !== "Por geolocalizar") return declarada;
+
+    const latitude = Number(report.latitud);
+    if (latitude >= 4.68) return "Zona norte";
+    if (latitude >= 4.62) return "Zona centro";
+    return "Zona sur";
+}
+
+function localidadesCriticas() {
+    const criticos = new Set();
+    const grupos = new Map();
+    reportesVisibles().forEach((report) => {
+        const localidad = localidadReporte(report);
+        if (!grupos.has(localidad)) grupos.set(localidad, { localidad, total: 0 });
+        grupos.get(localidad).total += 1;
+    });
+
+    const lista = [...grupos.values()].sort((a, b) => b.total - a.total);
+    const total = lista.length;
+    lista.forEach((group, index) => {
+        const rank = total === 1
+            ? "high"
+            : total === 2
+                ? (index === 0 ? "high" : "low")
+                : index === 0 ? "high" : index === 1 ? "medium" : "low";
+        if (rank === "high") criticos.add(group.localidad);
+    });
+
+    return criticos;
+}
+
 function datosExportacion() {
+    const criticos = localidadesCriticas();
     return reportesVisibles().map((report) => [
         report.id,
         report.tipo,
-        features.sectorFor(report),
+        localidadReporte(report),
         report.ubicacion,
         report.descripcion,
         textoEstado(report.estado),
@@ -183,7 +217,8 @@ function datosExportacion() {
         report.empresa || "Sin empresa",
         (report.latitud && report.longitud)
             ? `${Number(report.latitud).toFixed(6)}, ${Number(report.longitud).toFixed(6)}`
-            : "Sin coordenadas"
+            : "Sin coordenadas",
+        criticos.has(localidadReporte(report)) ? "Sí" : "No"
     ]);
 }
 
@@ -197,7 +232,7 @@ function exportarExcel() {
     if (!rows.length) return mostrarToast("No hay reportes para exportar con el filtro actual.");
     features.downloadCSV(
         `runtrash-reportes-${new Date().toISOString().slice(0, 10)}.csv`,
-        ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas"],
+        ["ID", "Tipo", "Localidad", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas", "Punto crítico"],
         rows
     );
     mostrarToast("Archivo CSV compatible con Excel descargado.");
@@ -212,19 +247,31 @@ function exportarPDF() {
     const rows = datosExportacion();
     if (!rows.length) return mostrarToast("No hay reportes para exportar con el filtro actual.");
     try {
-        features.printPDF({
+        const criticos = rows.filter((row) => row[11] === "Sí");
+        const criticosPorLocalidad = new Map();
+        criticos.forEach((row) => {
+            const localidad = String(row[2] || "Sin localidad");
+            criticosPorLocalidad.set(localidad, (criticosPorLocalidad.get(localidad) || 0) + 1);
+        });
+        const puntoCritico = [...criticosPorLocalidad.entries()].sort((a, b) => b[1] - a[1])[0];
+        const resumen = [
+            { label: "Total", value: rows.length },
+            { label: "Pendientes", value: rows.filter((row) => row[5] === "Pendiente").length },
+            { label: "En proceso", value: rows.filter((row) => row[5] === "En proceso").length },
+            { label: "Completados", value: rows.filter((row) => row[5] === "Completado").length },
+            { label: "Con asignación", value: rows.filter((row) => row[6] !== "Sin asignar").length },
+            { label: "Sin asignación", value: rows.filter((row) => row[6] === "Sin asignar").length }
+        ];
+
+        if (criticos.length) resumen.push({ label: "Puntos críticos", value: criticos.length });
+        if (puntoCritico) resumen.push({ label: `Punto crítico · ${puntoCritico[0]}`, value: `${puntoCritico[1]} reporte(s)` });
+
+        return features.printPDF({
             title: "Reporte de gestión RunTrash",
             subtitle: `Filtro: ${document.getElementById("filtroActivo").textContent} · Generado el ${fechaBonita(new Date())}`,
-            headers: ["ID", "Tipo", "Sector", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas"],
+            headers: ["ID", "Tipo", "Localidad", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas", "Punto crítico"],
             rows,
-            summary: [
-                { label: "Total", value: rows.length },
-                { label: "Pendientes", value: rows.filter((row) => row[5] === "Pendiente").length },
-                { label: "En proceso", value: rows.filter((row) => row[5] === "En proceso").length },
-                { label: "Completados", value: rows.filter((row) => row[5] === "Completado").length },
-                { label: "Con asignación", value: rows.filter((row) => row[6] !== "Sin asignar").length },
-                { label: "Sin asignación", value: rows.filter((row) => row[6] === "Sin asignar").length }
-            ]
+            summary: resumen
         });
     } catch (error) {
         mostrarToast(error.message);
