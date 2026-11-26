@@ -132,9 +132,7 @@ router.get('/reportes', requiereEmpresa, async (req, res) => {
             });
         }
 
-        const reportes = await empresaRepo.listarReportesEmpresa(
-            usuario.empresa_id
-        );
+        const reportes = await reportesRepo.listarTodos();
 
         res.json({
             ok: true,
