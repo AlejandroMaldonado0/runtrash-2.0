@@ -12,6 +12,8 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const request = require('supertest');
+const app = require('../server');
 
 const { preparar, detectarEn, detectar } = require('../../frontend/pages/ciudadano/localidades.js');
 
@@ -119,4 +121,19 @@ test('detectar descarta coordenadas inválidas sin descargar el dataset', async 
     assert.equal(await detectar(6.2442, -75.5812), null);
     assert.equal(await detectar(Number.NaN, -74.0721), null);
     assert.equal(await detectar(4.7110, undefined), null);
+});
+
+test('la aplicación sirve el dataset y el módulo de detección', async () => {
+    const datos = await request(app).get('/frontend/data/localidades-bogota.json');
+
+    assert.equal(datos.status, 200);
+    assert.match(String(datos.headers['content-type']), /json/);
+    assert.equal(Object.keys(datos.body.localidades).length, 20);
+    assert.equal(datos.body.localidades.Chapinero.length, 1);
+
+    const modulo = await request(app).get('/frontend/pages/ciudadano/localidades.js');
+
+    assert.equal(modulo.status, 200);
+    assert.match(String(modulo.headers['content-type']), /javascript/);
+    assert.match(modulo.text, /LocalidadesBogota/);
 });
