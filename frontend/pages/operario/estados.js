@@ -226,7 +226,7 @@ async function confirmarCambioEstado(id) {
             form.append("foto", archivo);
         }
 
-        const response = await fetch(`${API}/api/reportes/${id}/estado`, {
+        const response = await features.apiFetch(`${API}/api/reportes/${id}/estado`, {
             method: "PUT",
             body: form
         });
