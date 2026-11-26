@@ -222,6 +222,69 @@ router.post('/operarios', requiereEmpresa, async (req, res) => {
  * El código se devuelve una sola vez; en la base solo queda su hash y
  * se revocan las sesiones abiertas del operario.
  */
+/**
+ * Actualiza la localidad asignada de un operario de la empresa.
+ *
+ * Permite cambiar o quitar la zona operativa sin recrear la cuenta.
+ */
+router.put('/operarios/:id', requiereEmpresa, async (req, res) => {
+    try {
+        const operarioId = Number(req.params.id);
+        const { zona_asignada } = req.body || {};
+
+        const { empresaId, error } = empresaDeLaPeticion(req);
+
+        if (error) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: error
+            });
+        }
+
+        if (!Number.isInteger(operarioId) || operarioId <= 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "Operario invalido."
+            });
+        }
+
+        const operario = await empresaRepo.obtenerOperario(operarioId);
+
+        if (!operario || operario.empresa_id !== empresaId) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "Operario no encontrado."
+            });
+        }
+
+        const zona = String(zona_asignada || "").trim() || null;
+
+        const usuario = await adminRepo.actualizarUsuario({
+            usuarioId: operarioId,
+            nombre: operario.nombre,
+            correo: operario.correo,
+            tipoUsuario: "operario",
+            codigoOperario: operario.codigo_operario,
+            zonaAsignada: zona,
+            empresaId: operario.empresa_id,
+            nitEmpresa: operario.nit_empresa,
+            actualizarCodigoVerificacion: false
+        });
+
+        return res.json({
+            ok: true,
+            mensaje: "Localidad actualizada correctamente.",
+            usuario
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            mensaje: "Error al actualizar la localidad del operario."
+        });
+    }
+});
+
 router.post('/operarios/:id/codigo-verificacion', requiereEmpresa, async (req, res) => {
     try {
         const { empresaId, error } = empresaDeLaPeticion(req);

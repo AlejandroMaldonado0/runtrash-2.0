@@ -117,6 +117,16 @@ function renderEquipo() {
                         <span>📍 ${zona}</span>
                         <span>🔢 Código NIT: <b>${features.escapeHTML(operator.codigo_operario || "—")}</b></span>
                     </div>
+                    <select
+                        class="team-zona-select"
+                        data-accion="actualizarLocalidadOperario"
+                        data-pasar="elemento"
+                        data-args='[${Number(operator.id)}]'
+                        aria-label="Localidad asignada"
+                    >
+                        <option value="">Sin localidad asignada</option>
+                        ${features.localidades.map((item) => `<option value="${item}"${String(operator.zona_asignada || "") === String(item) ? " selected" : ""}>${item}</option>`).join("")}
+                    </select>
                 </div>
                 <div class="team-code">
                     <span class="team-code-status ${tieneCodigo ? "activo" : "pendiente"}">

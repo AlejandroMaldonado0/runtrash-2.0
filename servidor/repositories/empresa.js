@@ -332,6 +332,27 @@ async function listarReportesEmpresa(empresaId, cliente = pool) {
     return resultado.rows;
 }
 
+/**
+ * Obtiene un operario por su identificador.
+ *
+ * @param {number} operarioId - Identificador del operario.
+ * @returns {Promise<object|null>} Operario encontrado.
+ */
+async function obtenerOperario(operarioId) {
+    const resultado = await pool.query(
+        `
+        SELECT id, nombre, correo, tipo_usuario, codigo_operario, zona_asignada, empresa_id, nit_empresa, activo
+        FROM usuarios
+        WHERE id = $1
+          AND tipo_usuario = 'operario'
+        LIMIT 1
+        `,
+        [operarioId]
+    );
+
+    return resultado.rows[0] || null;
+}
+
 module.exports = {
     listarOperarios,
     buscarOperarioDeEmpresa,

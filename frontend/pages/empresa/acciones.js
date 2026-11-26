@@ -12,6 +12,45 @@
  *
  * @returns {Promise<void>}
  */
+/**
+ * Actualiza la localidad asignada de un operario desde el panel.
+ *
+ * Permite cambiar o quitar la zona operativa sin crear la cuenta de
+ * nuevo; los reportes se re-adjudican automaticamente por localidad.
+ *
+ * @param {HTMLElement} [elemento] - Selector de localidad.
+ * @param {number} operarioId - Identificador del operario.
+ * @returns {Promise<void>}
+ */
+async function actualizarLocalidadOperario(elemento, operarioId) {
+    const zona = String(elemento?.value || "").trim() || null;
+    const operario = operarios.find((item) => Number(item.id) === Number(operarioId));
+
+    if (!operario) {
+        return mostrarToast("Operario no encontrado.");
+    }
+
+    try {
+        const respuesta = await features.apiFetch(`${API}/api/operarios/${Number(operarioId)}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ zona_asignada: zona })
+        });
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(resultado.mensaje || "No se pudo actualizar la localidad.");
+        }
+
+        operario.zona_asignada = zona;
+        await cargarDatos(true);
+        mostrarToast("Localidad actualizada.");
+        renderEquipo();
+    } catch (error) {
+        mostrarToast(error.message || "No se pudo actualizar la localidad.");
+    }
+}
+
 async function asignarAutomaticamente() {
     const unassigned = reportes.filter((report) => report.estado === "pendiente" && !report.operario_id);
     const button = document.getElementById("autoAssignButton");
