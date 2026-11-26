@@ -43,9 +43,9 @@ async function actualizarLocalidadOperario(elemento, operarioId) {
         }
 
         operario.zona_asignada = zona;
-        await cargarDatos(true);
-        mostrarToast("Localidad actualizada.");
         renderEquipo();
+        mostrarToast("Localidad actualizada.");
+        cargarDatos(true).catch(() => {});
     } catch (error) {
         mostrarToast(error.message || "No se pudo actualizar la localidad.");
     }
