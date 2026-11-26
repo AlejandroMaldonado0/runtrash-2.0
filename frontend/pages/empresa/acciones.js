@@ -266,12 +266,34 @@ function exportarPDF() {
         if (criticos.length) resumen.push({ label: "Puntos críticos", value: criticos.length });
         if (puntoCritico) resumen.push({ label: `Punto crítico · ${puntoCritico[0]}`, value: `${puntoCritico[1]} reporte(s)` });
 
+        const porLocalidad = new Map();
+        rows.forEach((row) => {
+            const localidad = String(row[2] || "Sin localidad");
+            porLocalidad.set(localidad, (porLocalidad.get(localidad) || 0) + 1);
+        });
+        const graficaPorLocalidad = {
+            title: "Reportes por localidad",
+            data: [...porLocalidad.entries()]
+                .map(([label, value]) => ({ label, value }))
+                .sort((a, b) => b.value - a.value)
+        };
+        const graficaPorEstado = {
+            title: "Reportes por estado",
+            data: ["Pendiente", "En proceso", "Completado"]
+                .map((estado) => ({
+                    label: estado,
+                    value: rows.filter((row) => row[5] === estado).length
+                }))
+                .filter((item) => item.value > 0)
+        };
+
         return features.printPDF({
             title: "Reporte de gestión RunTrash",
             subtitle: `Filtro: ${document.getElementById("filtroActivo").textContent} · Generado el ${fechaBonita(new Date())}`,
             headers: ["ID", "Tipo", "Localidad", "Ubicación", "Descripción", "Estado", "Operario", "Fecha", "Ciudadano", "Empresa", "Coordenadas", "Punto crítico"],
             rows,
-            summary: resumen
+            summary: resumen,
+            charts: [graficaPorLocalidad, graficaPorEstado]
         });
     } catch (error) {
         mostrarToast(error.message);

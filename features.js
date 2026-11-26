@@ -146,7 +146,7 @@
          * @returns {void}
          * @throws {Error} Si el navegador bloquea la ventana emergente.
          */
-        printPDF({ title, subtitle = "", headers = [], rows = [], summary = [] }) {
+        printPDF({ title, subtitle = "", headers = [], rows = [], summary = [], charts = [] }) {
             const printWindow = window.open("", "_blank", "width=1050,height=780");
 
             if (!printWindow) {
@@ -160,6 +160,20 @@
                         <strong>${this.escapeHTML(item.value)}</strong>
                     </div>
                 `).join("")}</div>`
+                : "";
+
+            const chartsHTML = charts.length
+                ? charts.map((chart) => {
+                    const data = chart.data || [];
+                    const max = data.reduce((mayor, item) => Math.max(mayor, Number(item.value) || 0), 1);
+                    const itemsHtml = data.map((item) => `
+                        <div class="chart-row">
+                            <span class="chart-label">${this.escapeHTML(item.label)}</span>
+                            <div class="chart-track"><span style="width:${Math.max(2, (Number(item.value) / max) * 100)}%"></span></div>
+                            <span class="chart-value">${this.escapeHTML(item.value)}</span>
+                        </div>`).join("");
+                    return `<div class="chart"><h2>${this.escapeHTML(chart.title)}</h2>${itemsHtml}</div>`;
+                }).join("")
                 : "";
 
             const tableHTML = headers.length
@@ -178,12 +192,13 @@
                     <meta charset="utf-8">
                     <title>${this.escapeHTML(title)}</title>
                     <style>
-                        *{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#17241d;margin:38px}header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0a9552;padding-bottom:18px;margin-bottom:24px}h1{margin:0 0 7px;color:#07542f;font-size:25px}p{margin:0;color:#66756d;font-size:13px}.brand{color:#0a9552;font-weight:800}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}.summary-card{background:#f0fcf4;border:1px solid #d5f1df;border-radius:10px;padding:12px}.summary-card span,.summary-card strong{display:block}.summary-card span{color:#66756d;font-size:11px;margin-bottom:5px}.summary-card strong{font-size:20px}table{width:100%;border-collapse:collapse;font-size:11px}th{background:#07542f;color:#fff;text-align:left;padding:10px}td{padding:9px 10px;border-bottom:1px solid #e3ebe6;vertical-align:top}tr:nth-child(even) td{background:#f8fbf9}.empty{padding:40px;text-align:center;background:#f4f7f5;border-radius:10px}@media print{body{margin:18px}.no-print{display:none}}
+                        *{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#17241d;margin:38px}header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0a9552;padding-bottom:18px;margin-bottom:24px}h1{margin:0 0 7px;color:#07542f;font-size:25px}p{margin:0;color:#66756d;font-size:13px}.brand{color:#0a9552;font-weight:800}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}.summary-card{background:#f0fcf4;border:1px solid #d5f1df;border-radius:10px;padding:12px}.summary-card span,.summary-card strong{display:block}.summary-card span{color:#66756d;font-size:11px;margin-bottom:5px}.summary-card strong{font-size:20px}table{width:100%;border-collapse:collapse;font-size:11px}th{background:#07542f;color:#fff;text-align:left;padding:10px}td{padding:9px 10px;border-bottom:1px solid #e3ebe6;vertical-align:top}tr:nth-child(even) td{background:#f8fbf9}.empty{padding:40px;text-align:center;background:#f4f7f5;border-radius:10px}.charts{margin-bottom:24px}.chart{background:#f8fbf9;border:1px solid #e3ebe6;border-radius:10px;padding:14px 16px}.chart h2{margin:0 0 12px;font-size:14px;color:#07542f}.chart-row{display:flex;align-items:center;gap:10px;margin:7px 0}.chart-label{flex:0 0 130px;font-size:11px;color:#17241d}.chart-track{flex:1;height:12px;background:#eef5f0;border-radius:6px;overflow:hidden}.chart-track span{display:block;height:100%;background:#0a9552;border-radius:6px}.chart-value{flex:0 0 auto;font-size:11px;font-weight:800;color:#07542f;min-width:28px;text-align:right}@media print{body{margin:18px}.no-print{display:none}}
                     </style>
                 </head>
                 <body>
                     <header><div><h1>${this.escapeHTML(title)}</h1><p>${this.escapeHTML(subtitle)}</p></div><span class="brand">RUNTRASH</span></header>
                     ${summaryHTML}
+                    ${chartsHTML}
                     ${tableHTML}
                     <script>window.addEventListener('load',()=>setTimeout(()=>window.print(),250));<\/script>
                 </body>
