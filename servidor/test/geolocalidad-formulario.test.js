@@ -2,8 +2,8 @@
  * @file Pruebas de la integración del GPS con el selector de localidad.
  *
  * Carga `formulario.js` en un contexto aislado con un DOM mínimo para
- * comprobar que, al obtener la ubicación, la localidad se selecciona
- * sola y que una elección manual del ciudadano se respeta.
+ * comprobar que la localidad se asigna sola, que el campo queda
+ * bloqueado y que un fallo de GPS no rompe el formulario.
  *
  * @module test/geolocalidad-formulario
  */
@@ -30,6 +30,7 @@ function crearElemento(valor = "") {
         value: valor,
         textContent: "",
         className: "",
+        innerHTML: "",
         dataset: {},
         disabled: false,
         isConnected: true,
@@ -50,6 +51,10 @@ function crearElemento(valor = "") {
  */
 function cargarFormulario({ detectar }) {
     const elementos = {
+        modalTitulo: crearElemento(),
+        modalCard: crearElemento(),
+        modalContenido: crearElemento(),
+        modal: crearElemento(),
         gpsButton: crearElemento(),
         gpsStatus: crearElemento(),
         nuevaLatitud: crearElemento(),
@@ -60,6 +65,10 @@ function cargarFormulario({ detectar }) {
 
     const contexto = {
         console,
+        configuracion: { limite_reportes_diarios: 5 },
+        features: { localidades: ["Chapinero", "Suba"] },
+        reportes: [],
+        exigirUsuario: () => true,
         document: {
             getElementById: (id) => elementos[id] || null
         },
@@ -91,7 +100,21 @@ function esperarMicrotareas() {
     return new Promise((resolver) => setImmediate(resolver));
 }
 
-test('el GPS selecciona la localidad detectada y lo informa', async () => {
+test('el formulario bloquea la localidad para que solo la asigne el GPS', async () => {
+    const { contexto, elementos } = cargarFormulario({
+        detectar: async () => "Chapinero"
+    });
+
+    contexto.abrirNuevoReporte();
+    await esperarMicrotareas();
+
+    assert.match(elementos.modalContenido.innerHTML, /id="nuevaLocalidad"[^>]*disabled/);
+    assert.match(elementos.modalContenido.innerHTML, /no se puede cambiar/);
+    assert.equal(elementos.nuevaLocalidad.value, "Chapinero");
+    assert.equal(elementos.nuevaLocalidad.classList.contains("campo-detectado"), true);
+});
+
+test('el GPS asigna la localidad detectada y lo informa', async () => {
     const { contexto, elementos } = cargarFormulario({
         detectar: async () => "Chapinero"
     });
@@ -102,28 +125,12 @@ test('el GPS selecciona la localidad detectada y lo informa', async () => {
     assert.equal(elementos.nuevaLatitud.value, 4.6486);
     assert.equal(elementos.nuevaLongitud.value, -74.0628);
     assert.equal(elementos.nuevaLocalidad.value, "Chapinero");
-    assert.equal(elementos.nuevaLocalidad.dataset.detectado, "1");
-    assert.equal(elementos.nuevaLocalidad.classList.contains("campo-detectado"), true);
     assert.match(elementos.gpsStatus.textContent, /Chapinero/);
     assert.match(elementos.gpsStatus.textContent, /12 m/);
     assert.equal(elementos.gpsStatus.className, "field-status is-success");
 });
 
-test('una localidad elegida a mano no se sobrescribe', async () => {
-    const { contexto, elementos } = cargarFormulario({
-        detectar: async () => "Chapinero"
-    });
-
-    elementos.nuevaLocalidad.value = "Suba";
-
-    contexto.usarUbicacion();
-    await esperarMicrotareas();
-
-    assert.equal(elementos.nuevaLocalidad.value, "Suba");
-    assert.match(elementos.gpsStatus.textContent, /localidad detectada: Chapinero/);
-});
-
-test('si el punto no cae en Bogotá pide elegir la localidad', async () => {
+test('si el punto no cae en Bogotá pide reactivar el GPS', async () => {
     const { contexto, elementos } = cargarFormulario({
         detectar: async () => null
     });
@@ -132,7 +139,7 @@ test('si el punto no cae en Bogotá pide elegir la localidad', async () => {
     await esperarMicrotareas();
 
     assert.equal(elementos.nuevaLocalidad.value, "");
-    assert.match(elementos.gpsStatus.textContent, /selecciónala manualmente/);
+    assert.match(elementos.gpsStatus.textContent, /no está dentro de Bogotá/);
     assert.equal(elementos.gpsStatus.className, "field-status is-warning");
 });
 
@@ -147,7 +154,7 @@ test('un fallo al cargar los polígonos no rompe el formulario', async () => {
     await esperarMicrotareas();
 
     assert.equal(elementos.nuevaLocalidad.value, "");
-    assert.match(elementos.gpsStatus.textContent, /selecciona la localidad manualmente/);
+    assert.match(elementos.gpsStatus.textContent, /no pudimos asignar la localidad/);
     assert.equal(elementos.nuevaLatitud.value, 4.6486);
 });
 

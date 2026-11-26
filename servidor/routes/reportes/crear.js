@@ -5,6 +5,9 @@
  * negocio (límite diario y asignación automática) vive en
  * `services/reportes`, dentro de una transacción.
  *
+ * La localidad no se acepta desde el cliente: se calcula con las
+ * coordenadas GPS para que no se pueda alterar.
+ *
  * @module routes/reportes/crear
  */
 
@@ -18,7 +21,7 @@ const { notificarUsuarios, idsPorRol } = require('../../lib/notificaciones');
 const { enParalelo, enParaleloSeguro } = require('../../lib/concurrencia');
 const upload = require('../../lib/upload');
 const almacen = require('../../lib/almacen');
-const { LOCALIDADES } = require('../../config');
+const { resolverLocalidad } = require('../../lib/geolocalizacion');
 
 const router = express.Router();
 
@@ -52,7 +55,6 @@ router.post('/reportes',
                 tipo,
                 descripcion,
                 ubicacion,
-                localidad,
                 latitud,
                 longitud
             } = req.body;
@@ -95,16 +97,6 @@ router.post('/reportes',
                 });
             }
 
-            if (!localidad || !LOCALIDADES.has(String(localidad).trim())) {
-
-                eliminarArchivoTemporal(req.file);
-
-                return res.status(400).json({
-                    ok: false,
-                    mensaje: 'Debes seleccionar una localidad válida.'
-                });
-            }
-
             if (!req.file) {
 
                 return res.status(400).json({
@@ -114,49 +106,24 @@ router.post('/reportes',
                 });
             }
 
-            let latitudFinal = null;
-            let longitudFinal = null;
-
-            if (
-                latitud !== undefined &&
-                latitud !== null &&
-                latitud !== ''
-            ) {
-
-                latitudFinal =
-                    Number(latitud);
-            }
-
-            if (
-                longitud !== undefined &&
-                longitud !== null &&
-                longitud !== ''
-            ) {
-
-                longitudFinal =
-                    Number(longitud);
-            }
-
-            const coordenadasIncompletas =
-                (latitudFinal === null) !== (longitudFinal === null);
-
-            const coordenadasInvalidas =
-                (latitudFinal !== null && (!Number.isFinite(latitudFinal) || latitudFinal < -90 || latitudFinal > 90))
-                || (longitudFinal !== null && (!Number.isFinite(longitudFinal) || longitudFinal < -180 || longitudFinal > 180));
-
             /*
-            Las coordenadas se validan antes de escribir la imagen:
-            así una petición inválida no deja archivos huérfanos en el
-            almacenamiento.
+            La localidad no se recibe del cliente: se calcula con las
+            coordenadas para que nadie pueda cambiarla. Se valida antes
+            de escribir la imagen para no dejar archivos huérfanos.
             */
-            if (coordenadasIncompletas || coordenadasInvalidas) {
+            const ubicacionGps = resolverLocalidad({ latitud, longitud });
+
+            if (!ubicacionGps.ok) {
 
                 return res.status(400).json({
                     ok: false,
-                    mensaje:
-                        'Las coordenadas GPS no son válidas.'
+                    mensaje: ubicacionGps.mensaje
                 });
             }
+
+            const latitudFinal = ubicacionGps.latitud;
+            const longitudFinal = ubicacionGps.longitud;
+            const localidadFinal = ubicacionGps.localidad;
 
             /*
             multer deja la foto en memoria (req.file.buffer).
@@ -191,7 +158,7 @@ router.post('/reportes',
                     tipo: tipoNormalizado,
                     descripcion: descripcionNormalizada,
                     ubicacion: ubicacionNormalizada,
-                    localidad: String(localidad).trim(),
+                    localidad: localidadFinal,
                     latitud: latitudFinal,
                     longitud: longitudFinal,
                     imagenUrl: imagen_url
