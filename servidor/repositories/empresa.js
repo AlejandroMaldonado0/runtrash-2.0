@@ -355,6 +355,7 @@ async function obtenerOperario(operarioId) {
 
 module.exports = {
     listarOperarios,
+    obtenerOperario,
     buscarOperarioDeEmpresa,
     buscarOperarioAsignable,
     asignarReporte,
